@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
+  <!-- Replace the content tag with appropriate information -->
+  <meta name="description" content="Project page for ProCyon model">
+  <meta property="og:title" content="ProCyon"/>
+  <meta property="og:description" content="A foundation model for protein phenotypes"/>
+  <meta property="og:url" content="https://zitniklab.hms.harvard.edu/ProCyon/"/>
+  <!-- Path to banner image, should be in the path listed below. Optimal dimensions are 1200X630-->
+  <meta property="og:image" content="static/images/ProCyon-09-cropped.png" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+
+  <meta name="twitter:title" content="ProCyon">
+  <meta name="twitter:description" content="A foundation model for protein phenotypes">
+  <!-- Path to banner image, should be in the path listed below. Optimal dimensions are 1200X600-->
+  <meta name="twitter:image" content="static/images/ProCyon-02-cropped.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Keywords for your paper to be indexed by-->
+  <meta name="keywords" content="AI for science, protein, foundation model, LLM">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <title>ProCyon</title>
+  <link rel="icon" type="image/x-icon" href="static/images/ProCyon-09-cropped.png">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+  rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+</head>
+<body>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <img src="static/images/ProCyon-02-cropped.png" alt="ProCyon banner" style="height: 20%; width: auto;">
+            <h1 class="title is-1 publication-title">A multimodal foundation model for protein phenotypes</h1>
+            <div class="is-size-5 publication-authors">
+              <!-- Paper authors -->
+              <span class="author-block">
+                <a href="#" target="_blank">Owen Queen</a><sup>1,*,+</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Yepeng Huang</a><sup>1,*</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.linkedin.com/in/robert-calef/" target="_blank">Robert Calef</a><sup>1,2,*</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://valegiunchiglia.github.io/personal_website/" target="_blank">Valentina Giunchiglia</a><sup>1,3,4</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Tianlong Chen</a><sup>1,2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">George Dasoulas</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">LeAnn Tai</a><sup>2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Yasha Ektefaie</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Ayush Noori</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Joseph Brown</a><sup>5,&dagger;</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Tom Cobley</a><sup>2,6</sup>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Karin Hrovatin</a><sup>7,8</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.tomhartvigsen.com/" target="_blank">Tom Hartvigsen</a><sup>9</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.helmholtz-munich.de/en/icb/research-groups/theis-lab" target="_blank">Fabian J. Theis</a><sup>7,10</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://pentelutelabmit.com/" target="_blank">Bradley Pentelute</a><sup>5,14</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://khuranalab.bwh.harvard.edu/" target="_blank">Vikram Khurana</a><sup>11,12,14</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://compbio.mit.edu/" target="_blank">Manolis Kellis</a><sup>2,14</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://zitniklab.hms.harvard.edu/" target="_blank">Marinka Zitnik</a><sup>1,13,14,15,&Dagger;;</sup>
+              </span>
+            </div>
+
+            <details>
+              <summary>Author Affiliations</summary>
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><sup>1</sup>Department of Biomedical Informatics, Harvard Medical School, Boston, MA, USA</span>
+                <span class="author-block"><sup>2</sup>Computer Science and Artificial Intelligence Laboratory, MIT, Cambridge, MA, USA</span>
+                <span class="author-block"><sup>3</sup>Department of Brain Sciences, Imperial College London, London, UK</span>
+                <span class="author-block"><sup>4</sup>Centre for Neuroimaging Sciences, King’s College London, London, UK</span>
+                <span class="author-block"><sup>5</sup>Department of Chemistry, MIT, Cambridge, MA, USA</span>
+                <span class="author-block"><sup>6</sup>Department of Computing, Imperial College London, London, UK</span>
+                <span class="author-block"><sup>7</sup>Institute of Computational Biology, Computational Health Center, Helmholtz Munich, Munich, Germany</span>
+                <span class="author-block"><sup>8</sup>TUM School of Life Sciences Weihenstephan, Technical University of Munich, Freising, Germany</span>
+                <span class="author-block"><sup>9</sup>School of Data Science, University of Virginia, VA, USA</span>
+                <span class="author-block"><sup>10</sup>School of Computation, Information and Technology, Technical University of Munich, Garching, Germany</span>
+                <span class="author-block"><sup>11</sup>Department of Neurology, Brigham and Women’s Hospital, Boston, MA, USA</span>
+                <span class="author-block"><sup>12</sup>Harvard Stem Cell Institute, Cambridge, MA, USA</span>
+                <span class="author-block"><sup>13</sup>Kempner Institute for the Study of Natural and Artificial Intelligence, Harvard University, MA, USA</span>
+                <span class="author-block"><sup>14</sup>Broad Institute of MIT and Harvard, Cambridge, MA, USA</span>
+                <span class="author-block"><sup>15</sup>Harvard Data Science Initiative, Cambridge, MA, USA</span>
+
+                <span class="eql-cntrb"><small><br><sup>*</sup>Co-first authors</small></span>
+                <span class="eql-cntrb"><small><br><sup>+</sup>Present address: Department of Computer Science, Stanford University, Stanford, CA, USA</small></span>
+                <span class="eql-cntrb"><small><br><sup>&dagger;</sup>Present address:  Acceleration Consortium, University of Toronto, Toronto, ON, Canada</small></span>
+                <span class="eql-cntrb"><small><br><sup>&Dagger;</sup>Corresponding author. Email: marinka@hms.harvard.edu</small></span>
+              </div>
+            </details>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <!-- ArXiv  Link -->
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/<ARXIV PAPER ID>" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                  </a>
+                </span>
+                <!-- Github link -->
+                <span class="link-block">
+                  <a href="https://github.com/mims-harvard/ProCyon" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+                <!-- Github link -->
+                <span class="link-block">
+                  <a href="https://huggingface.co/collections/mims-harvard/ProCyon-6716632e60e4b3785bf8bd04" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                  🤗
+                  </span>
+                  <span>HuggingFace</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Teaser capabilities-->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/model_use_cases.png" alt="ProCyon capabilities" style=" width: auto;">
+      <h2 class="subtitle has-text-left">
+        We present <strong>ProCyon, a foundation model for modeling, generating, and predicting protein phenotypes</strong>.
+        ProCyon supports flexible queries with interleaved protein and natural text inputs, enabling a vast array of applications, including:
+      </h2>
+
+      <div class="hero-body content">
+        <h2 class="subtitle has-text-weight-normal is-size-5">
+          <ul>
+            <li>Functional annotation for proteins</li>
+            <ul>
+              <li>Supporting completely unseen or poorly characterized proteins, or <strong>zero-shot generalization to novel proteins</strong></li>
+              <li>Able to generate annotations beyond pre-defined vocabularies and ontologies, or <strong>zero-shot generalization to novel phenotypes</strong></li>
+            </ul>
+            <li>Generation of detailed phenotype descriptions for arbitrary proteins ("protein captioning")</li>
+            <li>Protein retrieval from flexible natural language prompts, without restriction to specific keywords or pre-defined terms</li>
+            <li>Generalization to novel protein-phenotype tasks unseen during training, or <strong>zero-shot task transfer</strong>, such as</li>
+            <ul>
+              <li>Complex queries combining phenotypes from distinct knowledge domains, e.g. disease association and therapeutic interactions</li>
+              <li>Identifying protein domains targted by a given small molecule drug</li>
+              <li>Modeling the phenotypic effect of protein coding mutations</li>
+            </ul>
+          </ul>
+        <h2 class="subtitle has-text-left is-size-5 has-text-weight-normal">
+          <br>
+          These capabilities are enabled by instruction-tuning on a wide range of biological knowledge, allowing ProCyon to reason over protein
+          phenotypes across scales, ranging from molecular functions up to organism-level disease associations. By supporting flexible queries with interleaved proteins
+          and free text.
+          <br>
+          <br>
+          Importantly, <strong>ProCyon is an open model</strong>, with <a href="https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct" target="_blank">open and accessible training data</a>,
+          <a href="https://github.com/mims-harvard/ProCyon" target="_blank">open-source training code</a>, reproducible training recipes,
+          transparent evaluations, intermediate checkpoints, and more.
+        </h2>
+
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End teaser capabilities -->
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Understanding the roles of human proteins remains a major challenge, with approximately 20% of human proteins lacking known functions and more than 40% missing context-specific functional insights. Even well-annotated proteins are often poorly characterized in diverse biological contexts, disease states, and perturbations.
+            We present ProCyon, a foundation model for modeling, generating, and predicting protein phenotypes across five interrelated knowledge domains: molecular functions, therapeutic mechanisms, disease associations, functional protein domains, and molecular interactions. To support this, we created ProCyon-Instruct, a dataset of 33 million protein phenotype instructions, representing a comprehensive resource for multiscale protein phenotypes.
+            By co-training a large language model with multimodal molecular encoders, ProCyon integrates phenotypic and protein data. A novel architecture and instruction tuning strategy allow ProCyon to process arbitrarily interleaved protein-and-phenotype inputs, achieve zero-shot task transfer, and generate free-form text phenotypes interleaved with retrieved protein sequence, structure, and drug modalities in a single unified model.
+            ProCyon achieves strong performance against single-modality models, multimodal models such as ESM3, as well as text-only LLMs on dozens of benchmarking tasks such as contextual protein retrieval and question answering.
+            We extensively evaluate ProCyon for biological applications, including identifying protein domains that bind small molecule drugs, predicting peptide binding with enzymes, and assessing the functional impact of Alzheimer's disease mutations. ProCyon enables conditional retrieval of proteins linked to small molecules through complementary mechanisms of action. It generates candidate phenotypes for under-characterized proteins recently implicated in Parkinson's disease, facilitating hypothesis generation for poorly understood proteins and biological processes.
+            ProCyon paves the way toward an effective, general solution for functional protein biology that can enable new insights into the human proteome.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+
+<!-- Model overview -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <!-- Paper video. -->
+      <h2 class="title is-2 has-text-centered">ProCyon Model</h2>
+      <div class="container is-centered has-text-centered">
+        <img src="static/images/detailed_arch.png" alt="ProCyon model architecture" style="height: 500px; width: auto;">
+          <section class="section hero is-light">
+            <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
+                ProCyon is an 11-billion parameter unified multimodal model fusing state-of-the-art large language models
+                and protein representation learning methods.
+                Its core is based on the transformer architecture of the Llama-3 language model. To support high-quality,
+                holistic protein modeling, ProCyon integrates advanced encoders for protein
+                sequence (ESM models) and protein structure (GearNet). ProCyon supports <strong>
+                multimodal inputs within textual prompts</strong>, enabling diverse queries, such as requests for protein-protein
+                interaction data. Using dedicated protein representation modules rather than a controlled
+                vocabulary, ProCyon generalizes effectively to zero-shot proteins, novel therapeutic modalities,
+                and protein regions, including domains and peptides.
+            </h2>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End model overview -->
+
+<!-- Dataset construction -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2 has-text-centered">ProCyon-Instruct Dataset</h2>
+      <div id="results-carousel" class="carousel results-carousel has-text-centered" data-autoplay-speed=100000>
+         <div class="item">
+          <img src="static/images/figure2a.png" alt="Schematic of instruction construction" style="height: 500px; padding-bottom: 60px;  width: auto"/>
+        </div>
+        <div class="item">
+          <img src="static/images/figure2c.png" class="centered-image" alt="Statistics on dataset size" style="height: 500px; width: auto"/>
+        </div>
+      </div>
+      <section class="section hero is-light">
+        <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
+          To train ProCyon, we create ProCyon-Instruct, a dataset of <strong>677,154 protein-phenotype pairs between
+          48,920 unique phenotypes and 56,753 proteins, domains, and peptides</strong>. Data for ProCyon-Instruct is drawn from 11
+          different curated databases, capturing phenotypic information for proteins across <strong>five knowledge domains</strong>.
+
+          We transform this data into an instruction
+          tuning dataset, expressing protein-phenotype pairs gathered from each database as a natural language instruction. To generate a larger diversity of text in the instructions, we leverage an external LLM
+          to rephrase the raw descriptions, resulting in a final dataset of <strong>33,899,528 instructions</strong> for training ProCyon models.
+        </h2>
+      </section>
+    </div>
+  </div>
+</section>
+<!-- End dataset construction -->
+
+<!-- Benchmarking performance -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2 has-text-centered">Performance Comparison</h2>
+      <div class="container is-centered has-text-centered">
+        <img src="static/images/baselines_for_website.png" alt="ProCyon benchmarking results" style="height: 500px; width: auto;">
+        <section class="section hero is-light">
+          <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
+            ProCyon shows strong performance on a benchmark of fourteen biologically-relevant tasks constructed from ProCyon-Instruct and framed
+            as either question-answering or protein retrieval tasks.
+            ProCyon is the only model to consistently outperform both single-modality and multi-modality models across tasks. We also
+            find that <strong>ProCyon maintains strong performance on 3,250 completely unseen phenotypes across knowledge domains</strong>, showing
+            its ability to reason over novel scientific concepts.
+          </h2>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End benchmarking performance -->
+
+<!-- Model capabilities -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-2 has-text-centered">ProCyon Capabilities</h2>
+
+      <!-- Retrieval/STING -->
+      <div class="container is-centered has-text-centered">
+        <h2 class="title is-3 has-text-centered">Free-text protein retrieval</h2>
+        <img src="static/images/sting_fig_v2.png" alt="ProCyon STING figure" style="height: 400px; width: auto;">
+        <section class="section hero is-light">
+          <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
+            ProCyon is able to successfully retrieve the STING protein given functional queries related to neuronal inflammatory stress response,
+            a role of STING that was only described in <a href="https://pubmed.ncbi.nlm.nih.gov/38878778/">scientific literature </a>published after
+            ProCyon's training data cutoff date. Increasingly precise and functionally-relevant descriptions increases the retrieval rank of STING,
+            showing <strong>ProCyon's ability to assist in the scientific discovery process.</strong>
+          </h2>
+        </section>
+      </div>
+      <!-- End retrieval/STING -->
+    </div>
+  </div>
+</section>
+
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <!-- Captioning/QA filtering AKNAD1 -->
+      <div class="container is-centered has-text-centered">
+        <h2 class="title is-3 has-text-centered">Functional annotation of under-studied proteins</h2>
+        <img src="static/images/aknad1.png" alt="ProCyon AKNAD1 figure" style="height: 400px; width: auto;">
+        <section class="section hero is-light">
+          <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
+            We generate a UniProt-style description for AKNAD1, a poorly-characterized protein that does not appear in the training data for
+            ProCyon. Two of the three final descriptions show evidence in the Human Protein Atlas through subcellular localization assays and
+            scRNA-seq studies. <strong>ProCyon's free-text outputs allow generation of descriptions unbound by a controlled vocabulary.</strong>
+          </h2>
+        </section>
+      </div>
+      <!-- End captioning/QA filtering AKNAD1 -->
+    </div>
+  </div>
+</section>
+
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <!-- Zero-shot task transfer -->
+      <div class="container is-centered has-text-centered">
+        <h2 class="title is-3 has-text-centered">Zero-shot task transfer</h2>
+        <img src="static/images/cross_kd.png" alt="ProCyon cross-KD figure" style="height: 500px; width: auto;">
+        <section class="section hero is-light">
+          <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
+           We show that ProCyon exhibits <strong>zero-shot task transfer and cross-knowledge domain reasoning</strong>, exhibiting the
+            ability to perform tasks beyond its training tasks and that require reasoning across knowledge domains. Here we show ProCyon's
+            ability to conditonally retrieve two distinct proteins targeted by the same drug depending on which disease description
+            is provided in the input prompt.
+          </h2>
+        </section>
+      </div>
+      <!-- End zero-shot task transfer-->
+      <!-- End novel phenotype generation w/ expert scoring -->
+    </div>
+  </div>
+</section>
+<!-- End model capabilities -->
+
+
+
+<!-- Plug for paper -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+          <h2 class="subtitle has-text-weight-normal is-size-4" style="text-align: left;">
+            We hope you enjoyed this preview of how ProCyon can push the boundaries of AI for protein understanding, for more details and additional
+            experiments, please see our full manuscript!
+          </h2>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End plug -->
+
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>BibTex Code Here</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+  <footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Statcounter tracking code -->
+
+<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
+
+    <!-- End of Statcounter Code -->
+
+  </body>
+  </html>
