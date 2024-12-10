@@ -57,10 +57,10 @@
             <div class="is-size-5 publication-authors">
               <!-- Paper authors -->
               <span class="author-block">
-                <a href="#" target="_blank">Owen Queen</a><sup>1,*,+</sup>,
+                <a href="https://owencqueen.github.io/" target="_blank">Owen Queen</a><sup>1,*,+</sup>,
               </span>
               <span class="author-block">
-                <a href="#" target="_blank">Yepeng Huang</a><sup>1,*</sup>,
+                <a href="https://www.linkedin.com/in/yepeng-huang" target="_blank">Yepeng Huang</a><sup>1,*</sup>,
               </span>
               <span class="author-block">
                 <a href="https://www.linkedin.com/in/robert-calef/" target="_blank">Robert Calef</a><sup>1,2,*</sup>,
@@ -118,14 +118,14 @@
                 <span class="author-block"><sup>1</sup>Department of Biomedical Informatics, Harvard Medical School, Boston, MA, USA</span>
                 <span class="author-block"><sup>2</sup>Computer Science and Artificial Intelligence Laboratory, MIT, Cambridge, MA, USA</span>
                 <span class="author-block"><sup>3</sup>Department of Brain Sciences, Imperial College London, London, UK</span>
-                <span class="author-block"><sup>4</sup>Centre for Neuroimaging Sciences, King’s College London, London, UK</span>
+                <span class="author-block"><sup>4</sup>Centre for Neuroimaging Sciences, King's College London, London, UK</span>
                 <span class="author-block"><sup>5</sup>Department of Chemistry, MIT, Cambridge, MA, USA</span>
                 <span class="author-block"><sup>6</sup>Department of Computing, Imperial College London, London, UK</span>
                 <span class="author-block"><sup>7</sup>Institute of Computational Biology, Computational Health Center, Helmholtz Munich, Munich, Germany</span>
                 <span class="author-block"><sup>8</sup>TUM School of Life Sciences Weihenstephan, Technical University of Munich, Freising, Germany</span>
                 <span class="author-block"><sup>9</sup>School of Data Science, University of Virginia, VA, USA</span>
                 <span class="author-block"><sup>10</sup>School of Computation, Information and Technology, Technical University of Munich, Garching, Germany</span>
-                <span class="author-block"><sup>11</sup>Department of Neurology, Brigham and Women’s Hospital, Boston, MA, USA</span>
+                <span class="author-block"><sup>11</sup>Department of Neurology, Brigham and Women's Hospital, Boston, MA, USA</span>
                 <span class="author-block"><sup>12</sup>Harvard Stem Cell Institute, Cambridge, MA, USA</span>
                 <span class="author-block"><sup>13</sup>Kempner Institute for the Study of Natural and Artificial Intelligence, Harvard University, MA, USA</span>
                 <span class="author-block"><sup>14</sup>Broad Institute of MIT and Harvard, Cambridge, MA, USA</span>
@@ -208,13 +208,12 @@
         <h2 class="subtitle has-text-left is-size-5 has-text-weight-normal">
           <br>
           These capabilities are enabled by instruction-tuning on a wide range of biological knowledge, allowing ProCyon to reason over protein
-          phenotypes across scales, ranging from molecular functions up to organism-level disease associations. By supporting flexible queries with interleaved proteins
-          and free text.
+          phenotypes across scales, ranging from molecular functions up to organism-level disease associations.
           <br>
           <br>
           Importantly, <strong>ProCyon is an open model</strong>, with <a href="https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct" target="_blank">open and accessible training data</a>,
           <a href="https://github.com/mims-harvard/ProCyon" target="_blank">open-source training code</a>, reproducible training recipes,
-          transparent evaluations, intermediate checkpoints, and more.
+          transparent evaluations, <a href="https://huggingface.co/collections/mims-harvard/procyon-6716632e60e4b3785bf8bd04">intermediate checkpoints</a>, and more.
         </h2>
 
       </div>
@@ -341,7 +340,7 @@
           <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
             ProCyon is able to successfully retrieve the STING protein given functional queries related to neuronal inflammatory stress response,
             a role of STING that was only described in <a href="https://pubmed.ncbi.nlm.nih.gov/38878778/">scientific literature </a>published after
-            ProCyon's training data cutoff date. Increasingly precise and functionally-relevant descriptions increases the retrieval rank of STING,
+            ProCyon's training data cutoff date. Increasingly precise and functionally-relevant descriptions increase the retrieval rank of STING,
             showing <strong>ProCyon's ability to assist in the scientific discovery process.</strong>
           </h2>
         </section>
@@ -362,7 +361,7 @@
           <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
             We generate a UniProt-style description for AKNAD1, a poorly-characterized protein that does not appear in the training data for
             ProCyon. Two of the three final descriptions show evidence in the Human Protein Atlas through subcellular localization assays and
-            scRNA-seq studies. <strong>ProCyon's free-text outputs allow generation of descriptions unbound by a controlled vocabulary.</strong>
+            scRNA-seq studies. <strong>ProCyon's free-text outputs allow generation of descriptions unbounded by a controlled vocabulary.</strong>
           </h2>
         </section>
       </div>
@@ -381,7 +380,7 @@
         <section class="section hero is-light">
           <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
            We show that ProCyon exhibits <strong>zero-shot task transfer and cross-knowledge domain reasoning</strong>, exhibiting the
-            ability to perform tasks beyond its training tasks and that require reasoning across knowledge domains. Here we show ProCyon's
+            ability to perform tasks beyond those it was explicitly trained on, and even those that require reasoning across knowledge domains. Here we show ProCyon's
             ability to conditonally retrieve two distinct proteins targeted by the same drug depending on which disease description
             is provided in the input prompt.
           </h2>
