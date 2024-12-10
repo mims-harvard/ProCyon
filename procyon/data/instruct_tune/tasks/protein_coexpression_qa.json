@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown two proteins. Your job is to determine if the two protein interact based on {Relationship Summary}. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "protein_protein",
+    "CATEGORY": "qa",
+    "Relationship Summary": "similar patterns of mRNA expression measured by DNA arrays and similar technologies",
+    "Biological Summary": "",
+    "Task-Specific Relationship": "High values of co-expression between two proteins may be predictive of protein-protein interactions. ",
+    "Positive Examples": [
+        {
+            "aaseq_1": 12981,
+            "aaseq_2": 13335,
+            "output": "yes"
+        },
+        {
+            "aaseq_1": 15120,
+            "aaseq_2": 2334,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "aaseq_1": 9262,
+            "aaseq_2": 14185,
+            "output": "no"
+        },
+        {
+            "aaseq_1": 3907,
+            "aaseq_2": 6973,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

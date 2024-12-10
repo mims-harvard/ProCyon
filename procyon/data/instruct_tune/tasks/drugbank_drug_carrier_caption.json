@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown a protein. Your job is to describe {Biological Summary}, and this protein should be {Relationship Summary}. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "drugbank",
+    "CATEGORY": "caption",
+    "Relationship Summary": "a carrier of the drug",
+    "Biological Summary": "a drug",
+    "Task-Specific Relationship": "A carrier of a drug is a secreted protein which binds to drugs, carrying them to cell transporters, where they are moved into the cell.",
+    "Positive Examples": [
+        {
+            "text": 294,
+            "aaseq": 67,
+            "output": "yes"
+        },
+        {
+            "text": 777,
+            "aaseq": 66,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 1075,
+            "aaseq": 12755,
+            "output": "no"
+        },
+        {
+            "text": 1486,
+            "aaseq": 6883,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

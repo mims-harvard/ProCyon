@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary} along with a protein. Your job is to determine if the shown protein is {Relationship Summary} that the text describes. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "reactome",
+    "CATEGORY": "qa",
+    "Relationship Summary": "involved in the process or pathway",
+    "Biological Summary": "a biological process or pathway",
+    "Task-Specific Relationship": "Involvement is determined by life scientists, using evidence from the scientific literature and input from experts in each pathway. ",
+    "Positive Examples": [
+        {
+            "text": 2097,
+            "aaseq": 1867,
+            "output": "yes"
+        },
+        {
+            "text": 2113,
+            "aaseq": 17691,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 232,
+            "aaseq": 7554,
+            "output": "no"
+        },
+        {
+            "text": 2196,
+            "aaseq": 10455,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

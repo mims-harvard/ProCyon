@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown one protein. Your job is to determine the proteins that interact with the provided protein based on {Relationship Summary}. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "protein_protein",
+    "CATEGORY": "retrieval",
+    "Relationship Summary": "experimental data, such as, affinity chromatography",
+    "Biological Summary": "",
+    "Task-Specific Relationship": "Experimental methods, including yeast two-hybrid, affinity chromatography, tandem affinity purification coupled to mass spectrometry, among many others, establish direct or indirect physical interactions between protein pairs. ",
+    "Positive Examples": [
+        {
+            "aaseq_1": 13076,
+            "aaseq_2": 13389,
+            "output": "yes"
+        },
+        {
+            "aaseq_1": 6827,
+            "aaseq_2": 6826,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "aaseq_1": 13801,
+            "aaseq_2": 7226,
+            "output": "no"
+        },
+        {
+            "aaseq_1": 2371,
+            "aaseq_2": 3461,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

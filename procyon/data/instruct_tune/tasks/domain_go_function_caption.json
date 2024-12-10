@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown a domain. Your job is to describe {Biological Summary}, and this domain should be {Relationship Summary}. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "domain_go",
+    "CATEGORY": "caption",
+    "Relationship Summary": "involved in the function",
+    "Biological Summary": "a molecular function, or a molecular activity that occur at the molecular level, such as 'catalysis' or 'transport', performed by proteins",
+    "Task-Specific Relationship": "When a domain family appears in a set of functionally similar proteins, the conserved function described at the most specific level to be relevant to all proteins in that family are associated with the domain family, and thus all domains belonging to the family. ",
+    "Positive Examples": [
+        {
+            "text": 1686,
+            "aaseq": 21625,
+            "output": "yes"
+        },
+        {
+            "text": 348,
+            "aaseq": 11468,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 419,
+            "aaseq": 24927,
+            "output": "no"
+        },
+        {
+            "text": 3544,
+            "aaseq": 25502,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

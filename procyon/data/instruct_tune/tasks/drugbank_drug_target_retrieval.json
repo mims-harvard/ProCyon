@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary}. Your job is to determine the proteins that are {Relationship Summary} described. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "drugbank",
+    "CATEGORY": "retrieval",
+    "Relationship Summary": "a target of the drug",
+    "Biological Summary": "a drug",
+    "Task-Specific Relationship": "A target of a drug is a protein that the drug binds to, resulting in an alteration of the normal function of the bound molecule and a desirable therapeutic effect. Drug targets are most commonly proteins such as enzymes, ion channels, and receptors",
+    "Positive Examples": [
+        {
+            "text": 2660,
+            "aaseq": 5283,
+            "output": "yes"
+        },
+        {
+            "text": 38,
+            "aaseq": 5202,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 453,
+            "aaseq": 7074,
+            "output": "no"
+        },
+        {
+            "text": 80,
+            "aaseq": 7156,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

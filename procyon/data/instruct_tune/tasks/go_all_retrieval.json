@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary}. Your job is to determine the proteins that are {Relationship Summary} described. {Task-Specific Relationship}.",
+    "DATASET_IDENTIFIER": "go",
+    "CATEGORY": "retrieval",
+    "Relationship Summary": "involved in the function",
+    "Biological Summary": "a pathway or biological function where proteins are involved",
+    "Task-Specific Relationship": "Involvement is determined by whether or not there is evidence from an experiment directly supporting the annotation of the protein",
+    "Positive Examples": [
+        {
+            "text": 1305,
+            "aaseq": 13883,
+            "output": "yes"
+        },
+        {
+            "text": 889,
+            "aaseq": 14792,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 3351,
+            "aaseq": 12296,
+            "output": "no"
+        },
+        {
+            "text": 464,
+            "aaseq": 15896,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

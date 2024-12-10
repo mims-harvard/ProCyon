@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown two proteins. Your job is to determine if the two protein interact based on {Relationship Summary}. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "protein_protein",
+    "CATEGORY": "qa",
+    "Relationship Summary": "the degree of homology of the interactors",
+    "Biological Summary": "",
+    "Task-Specific Relationship": "Two proteins would have more potential to interact, if their homologous proteins exist in proximity of each other in a known PPI network. ",
+    "Positive Examples": [
+        {
+            "aaseq_1": 7442,
+            "aaseq_2": 7466,
+            "output": "yes"
+        },
+        {
+            "aaseq_1": 358,
+            "aaseq_2": 360,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "aaseq_1": 11695,
+            "aaseq_2": 1766,
+            "output": "no"
+        },
+        {
+            "aaseq_1": 13649,
+            "aaseq_2": 8490,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

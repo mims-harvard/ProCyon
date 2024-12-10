@@ -1,0 +1,38 @@
+{
+    "DATASET_IDENTIFIER": [
+        "go"
+    ],
+    "CATEGORY": [
+        "Question Answering"
+    ],
+    "Definition": "You will be shown text describing {Relationship Summary} along with a protein. Your job is to determine if the shown protein is {Biological Summary} that the text describes. {Task-Specific Relationship}. You may only output Yes or No. If the protein shown is the one described, you should respond Yes. Otherwise, you should respond No.",
+    "Relationship Summary": "a pathway or biological function where proteins are involved",
+    "Biological Summary": "involved in the function",
+    "Task-Specific Relationship": "Involvement is determined by whether or not there is evidence from an experiment directly supporting the annotation of the protein",
+    "Positive Examples": [
+        {
+            "input": "protein: [PROT] description: [EXT] Does the description match the protein? Options: yes, no. [ANSWER] {answer}",
+            "output": "yes",
+            "UniProtID": "P31946"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "input": "protein: [PROT] description: [EXT] Does the description match the protein? Options: yes, no. [ANSWER] {answer}",
+            "output": "yes",
+            "UniProtID": "P31946"
+        }
+    ],
+    "Instances": [
+        {
+            "input": "protein: [PROT] description: [EXT] Does the description match the protein? Options: yes, no. [ANSWER] {answer}",
+            "output": "yes",
+            "UniProtID": "P31946"
+        },
+        {
+            "input": "protein: [PROT] description: [EXT] Does the description match the protein? Options: yes, no. [ANSWER] {answer}",
+            "output": "no",
+            "UniProtID": "P62258"
+        }
+    ]
+}

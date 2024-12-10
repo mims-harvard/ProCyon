@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown a domain. Your job is to describe {Biological Summary}, and this domain should be {Relationship Summary}. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "domain_go",
+    "CATEGORY": "caption",
+    "Relationship Summary": "involved in the component",
+    "Biological Summary": "a cellular component, or a location relative to cellular structures in which proteins perform functions, either a cellular compartment (e.g., mitochondrion), or a stable macromolecular complex of which they are parts (e.g., the ribosome)",
+    "Task-Specific Relationship": "When a domain family appears in a set of functionally similar proteins, the conserved location described at the most specific level to be relevant to all proteins in that family are associated with the domain family, and thus all domains belonging to the family. ",
+    "Positive Examples": [
+        {
+            "text": 495,
+            "aaseq": 7104,
+            "output": "yes"
+        },
+        {
+            "text": 4109,
+            "aaseq": 16613,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 1912,
+            "aaseq": 35610,
+            "output": "no"
+        },
+        {
+            "text": 4382,
+            "aaseq": 25087,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

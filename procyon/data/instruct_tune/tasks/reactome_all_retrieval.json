@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary}. Your job is to determine the proteins that are {Relationship Summary} described. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "reactome",
+    "CATEGORY": "retrieval",
+    "Relationship Summary": "involved in the process or pathway",
+    "Biological Summary": "a biological process or pathway",
+    "Task-Specific Relationship": "Involvement is determined by life scientists, using evidence from the scientific literature and input from experts in each pathway. ",
+    "Positive Examples": [
+        {
+            "text": 2097,
+            "aaseq": 1867,
+            "output": "yes"
+        },
+        {
+            "text": 2113,
+            "aaseq": 17691,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 232,
+            "aaseq": 7554,
+            "output": "no"
+        },
+        {
+            "text": 2196,
+            "aaseq": 10455,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown a protein. Your job is to describe {Biological Summary}, and this protein should be {Relationship Summary}. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "uniprot",
+    "CATEGORY": "caption",
+    "Relationship Summary": "involved in the function",
+    "Biological Summary": "function(s) of a protein",
+    "Task-Specific Relationship": "This response provides any useful information about the protein, mostly biological knowledge. When a protein is a precursor of different chains/peptides having different functions, specify the role of each peptide in separate paragraphs. The same holds true for isoform-specific functions. Multifunctional enzymes should have only one 'Function' section for the different activities. When a protein displays some very different or contradictory functions depending on the context, describe them in different sentences. This case is rare.",
+    "Positive Examples": [
+        {
+            "text": 5,
+            "aaseq": 5,
+            "output": "yes"
+        },
+        {
+            "text": 246,
+            "aaseq": 246,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 6016,
+            "aaseq": 12345,
+            "output": "no"
+        },
+        {
+            "text": 12205,
+            "aaseq": 789,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

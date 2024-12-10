@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary}. Your job is to determine the domains that are {Relationship Summary} described. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "pfam",
+    "CATEGORY": "retrieval",
+    "Relationship Summary": "a member of the domain family",
+    "Biological Summary": "a domain family, which is represented by multiple sequence alignments and a profile hidden Markov model, ",
+    "Task-Specific Relationship": "Proteins are generally comprised of one or more functional regions, commonly termed domains. The presence of different domains in varying combinations in different proteins gives rise to the diverse repertoire of proteins found in nature. A domain is grouped into a family if its sequence aligns well with other curated domains in the family. ",
+    "Positive Examples": [
+        {
+            "text": 19,
+            "aaseq": 670,
+            "output": "yes"
+        },
+        {
+            "text": 3882,
+            "aaseq": 20035,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 2009,
+            "aaseq": 27176,
+            "output": "no"
+        },
+        {
+            "text": 1953,
+            "aaseq": 35903,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

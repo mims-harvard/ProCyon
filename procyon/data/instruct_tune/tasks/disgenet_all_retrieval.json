@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary}. Your job is to determine the proteins that are {Relationship Summary} described. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "disgenet",
+    "CATEGORY": "retrieval",
+    "Relationship Summary": "associated with the disease",
+    "Biological Summary": "a disease, which could be common, rare (Mendelian), complex or environmental",
+    "Task-Specific Relationship": "The associations are provided by various expert curated resources, representing relationships where there is established evidence linking genetic variations or mutations to the occurrence, risk, or progression of diseases. The associations indicate whether a protein, through its variation or mutation, plays a role in the manifestation of a disease, either by directly causing it, serving as a marker for it, being implicated in its mechanism, or being targeted for therapeutic intervention. ",
+    "Positive Examples": [
+        {
+            "text": 29786,
+            "aaseq": 6549,
+            "output": "yes"
+        },
+        {
+            "text": 237730,
+            "aaseq": 1885,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 49144,
+            "aaseq": 15066,
+            "output": "no"
+        },
+        {
+            "text": 144078,
+            "aaseq": 9505,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

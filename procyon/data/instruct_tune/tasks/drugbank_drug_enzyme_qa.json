@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary} along with a protein. Your job is to determine if the shown protein is {Relationship Summary} that the text describes. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "drugbank",
+    "CATEGORY": "qa",
+    "Relationship Summary": "an enzyme of the drug",
+    "Biological Summary": "a drug",
+    "Task-Specific Relationship": "An enzyme of a drug is a protein which catalyzes chemical reactions involving the given drug (substrate). ",
+    "Positive Examples": [
+        {
+            "text": 562,
+            "aaseq": 3178,
+            "output": "yes"
+        },
+        {
+            "text": 2802,
+            "aaseq": 3211,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 821,
+            "aaseq": 16275,
+            "output": "no"
+        },
+        {
+            "text": 221,
+            "aaseq": 13936,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

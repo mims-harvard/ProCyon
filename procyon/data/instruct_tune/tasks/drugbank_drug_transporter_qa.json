@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary} along with a protein. Your job is to determine if the shown protein is {Relationship Summary} that the text describes. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "drugbank",
+    "CATEGORY": "qa",
+    "Relationship Summary": "a transporter of the drug",
+    "Biological Summary": "a drug",
+    "Task-Specific Relationship": "A transporter of a drug is a membrane-bound protein which shuttles ions, small molecules or macromolecules across membranes, into cells or out of cells. ",
+    "Positive Examples": [
+        {
+            "text": 1339,
+            "aaseq": 9324,
+            "output": "yes"
+        },
+        {
+            "text": 217,
+            "aaseq": 151,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 2677,
+            "aaseq": 13602,
+            "output": "no"
+        },
+        {
+            "text": 1229,
+            "aaseq": 97,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

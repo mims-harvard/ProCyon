@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary} along with a protein. Your job is to determine if the shown protein is {Relationship Summary} that the text describes. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "ec",
+    "CATEGORY": "qa",
+    "Relationship Summary": "an enzyme that catalyzes the chemical reaction",
+    "Biological Summary": "a chemical reaction",
+    "Task-Specific Relationship": "",
+    "Positive Examples": [
+        {
+            "text": 201,
+            "aaseq": 12057,
+            "output": "yes"
+        },
+        {
+            "text": 1080,
+            "aaseq": 1928,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 633,
+            "aaseq": 574,
+            "output": "no"
+        },
+        {
+            "text": 641,
+            "aaseq": 4329,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

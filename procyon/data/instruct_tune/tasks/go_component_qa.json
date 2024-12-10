@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary} along with a protein. Your job is to determine if the shown protein is {Relationship Summary} that the text describes. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "go",
+    "CATEGORY": "qa",
+    "Relationship Summary": "involved in the component",
+    "Biological Summary": "a cellular component, or a location relative to cellular structures in which proteins perform functions, either a cellular compartment (e.g., mitochondrion), or a stable macromolecular complex of which they are parts (e.g., the ribosome)",
+    "Task-Specific Relationship": "Involvement is determined by whether or not there is evidence from an experiment directly supporting the annotation of the protein. ",
+    "Positive Examples": [
+        {
+            "text": 24,
+            "aaseq": 3908,
+            "output": "yes"
+        },
+        {
+            "text": 2567,
+            "aaseq": 11365,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 4075,
+            "aaseq": 2358,
+            "output": "no"
+        },
+        {
+            "text": 2847,
+            "aaseq": 6775,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary} along with a protein. Your job is to determine if the shown protein is {Relationship Summary} that the text describes. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "go",
+    "CATEGORY": "qa",
+    "Relationship Summary": "involved in the function",
+    "Biological Summary": "a molecular function, or a molecular activity that occur at the molecular level, such as 'catalysis' or 'transport', performed by proteins",
+    "Task-Specific Relationship": "Involvement is determined by whether or not there is evidence from an experiment directly supporting the annotation of the protein. ",
+    "Positive Examples": [
+        {
+            "text": 2598,
+            "aaseq": 11983,
+            "output": "yes"
+        },
+        {
+            "text": 4158,
+            "aaseq": 9476,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 1523,
+            "aaseq": 238,
+            "output": "no"
+        },
+        {
+            "text": 932,
+            "aaseq": 17098,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary} along with a protein. Your job is to determine if the shown protein is {Relationship Summary} that the text describes. {Task-Specific Relationship}You may only output yes or no. If the protein shown is the one described, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "gtop",
+    "CATEGORY": "qa",
+    "Relationship Summary": "a member of the target family",
+    "Biological Summary": "a target family",
+    "Task-Specific Relationship": "The classification of a protein to a target family is based on a combination of pharmacological, physiological, structural, genetic, and pathophysiological properties of the targets. Targets are grouped into families when they share significant similarities in their structure, function, and the way they interact with ligands. This process typically involves expert curation, where specialists in pharmacology and related fields review and classify each target based on these criteria. ",
+    "Positive Examples": [
+        {
+            "text": 50,
+            "aaseq": 2469,
+            "output": "yes"
+        },
+        {
+            "text": 329,
+            "aaseq": 13625,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 190,
+            "aaseq": 14831,
+            "output": "no"
+        },
+        {
+            "text": 187,
+            "aaseq": 363,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

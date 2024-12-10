@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary}. Your job is to determine the domains that are {Relationship Summary} described. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "domain_go",
+    "CATEGORY": "retrieval",
+    "Relationship Summary": "involved in the process",
+    "Biological Summary": "a biological process accomplished by multiple molecular activities where proteins are involved",
+    "Task-Specific Relationship": "When a domain family appears in a set of functionally similar proteins, the conserved process described at the most specific level to be relevant to all proteins in that family are associated with the domain family, and thus all domains belonging to the family. ",
+    "Positive Examples": [
+        {
+            "text": 868,
+            "aaseq": 22901,
+            "output": "yes"
+        },
+        {
+            "text": 4065,
+            "aaseq": 23647,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 885,
+            "aaseq": 20032,
+            "output": "no"
+        },
+        {
+            "text": 2614,
+            "aaseq": 1915,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

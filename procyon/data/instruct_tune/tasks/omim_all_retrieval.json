@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown text describing {Biological Summary}. Your job is to determine the proteins that are {Relationship Summary} described. {Task-Specific Relationship}",
+    "DATASET_IDENTIFIER": "omim",
+    "CATEGORY": "retrieval",
+    "Relationship Summary": "associated with the disease",
+    "Biological Summary": "a disease",
+    "Task-Specific Relationship": "Association is determined by whether or not a protein demonstrates molecular relationship between its genetic variation and phenotypic expression of the disease described. In other words, whether or not alterations (mutations) of a protein cause a disease or increase the risk of developing a disease. ",
+    "Positive Examples": [
+        {
+            "text": 464,
+            "aaseq": 13207,
+            "output": "yes"
+        },
+        {
+            "text": 4883,
+            "aaseq": 15613,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "text": 2715,
+            "aaseq": 16671,
+            "output": "no"
+        },
+        {
+            "text": 2670,
+            "aaseq": 925,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}

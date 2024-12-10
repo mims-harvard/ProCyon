@@ -1,0 +1,33 @@
+{
+    "Definition": "You will be shown a protein and a peptide. Your job is to determine if {Relationship Summary}. {Task-Specific Relationship}You may only output yes or no. If there is interaction between the protein and peptide, you should respond yes. Otherwise, you should respond no.",
+    "DATASET_IDENTIFIER": "peptide_peptide",
+    "CATEGORY": "qa",
+    "Relationship Summary": "the two entities interact based on the sequences provided. Note that some peptides may be large enough to constitute a protein",
+    "Biological Summary": "",
+    "Task-Specific Relationship": "Consider the following criteria when making your determination:\n1. Electrostatic Interactions: Look for complementary charges between the protein and peptide sequences.\n2. Hydrophobic Interactions: Identify regions where nonpolar amino acids might promote interaction through hydrophobic effects.\n3. Hydrogen Bonding: Check for potential hydrogen bonds between donor and acceptor groups in the sequences.\n4. Van der Waals Forces: Consider how the spatial proximity of atoms might contribute to weak, non-covalent interactions.\n5. Amino Acid Sequence: Assess the overall compatibility of the sequences for interaction potential. ",
+    "Positive Examples": [
+        {
+            "aaseq_1": 128,
+            "aaseq_2": 809,
+            "output": "yes"
+        },
+        {
+            "aaseq_1": 974,
+            "aaseq_2": 350,
+            "output": "yes"
+        }
+    ],
+    "Negative Examples": [
+        {
+            "aaseq_1": 1340,
+            "aaseq_2": 91,
+            "output": "no"
+        },
+        {
+            "aaseq_1": 0,
+            "aaseq_2": 359,
+            "output": "no"
+        }
+    ],
+    "Instances": null
+}
