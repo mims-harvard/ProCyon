@@ -145,9 +145,9 @@
                   <a href="https://arxiv.org/abs/<ARXIV PAPER ID>" target="_blank"
                   class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
-                    <i class="ai ai-arxiv"></i>
+                    <i class="ai ai-biorxiv"></i>
                   </span>
-                  <span>arXiv</span>
+                  <span>bioRxiv</span>
                   </a>
                 </span>
                 <!-- Github link -->
@@ -256,13 +256,11 @@
         <img src="static/images/detailed_arch.png" alt="ProCyon model architecture" style="height: 500px; width: auto;">
           <section class="section hero is-light">
             <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
-                ProCyon is an 11-billion parameter unified multimodal model fusing state-of-the-art large language models
-                and protein representation learning methods.
-                Its core is based on the transformer architecture of the Llama-3 language model. To support high-quality,
-                holistic protein modeling, ProCyon integrates advanced encoders for protein
-                sequence (ESM models) and protein structure (GearNet). ProCyon supports <strong>
-                multimodal inputs within textual prompts</strong>, enabling diverse queries, such as requests for protein-protein
-                interaction data. Using dedicated protein representation modules rather than a controlled
+                ProCyon is an 11-billion parameter multimodal model fusing state-of-the-art large language models
+                and protein representation learning methods. ProCyon supports <strong>
+                multimodal protein inputs interleaved within textual prompts</strong>, enabling diverse queries about
+                protein phenotypes and function.
+                By using dedicated protein representation modules rather than a controlled
                 vocabulary, ProCyon generalizes effectively to zero-shot proteins, novel therapeutic modalities,
                 and protein regions, including domains and peptides.
             </h2>
@@ -286,17 +284,22 @@
           <img src="static/images/figure2c.png" class="centered-image" alt="Statistics on dataset size" style="height: 500px; width: auto"/>
         </div>
       </div>
-      <section class="section hero is-light">
-        <h2 class="subtitle" style="max-width: 75%; margin: 0 auto; text-align: left;">
-          To train ProCyon, we create ProCyon-Instruct, a dataset of <strong>677,154 protein-phenotype pairs between
-          48,920 unique phenotypes and 56,753 proteins, domains, and peptides</strong>. Data for ProCyon-Instruct is drawn from 11
-          different curated databases, capturing phenotypic information for proteins across <strong>five knowledge domains</strong>.
+      <div class="hero-body content">
+        <section class="section hero is-light">
+          <h2 class="subtitle has-text-weight-normal is-size-5" style="max-width: 75%; margin: 0 auto; text-align: left;">
+            To train ProCyon, we create the ProCyon-Instruct dataset. Some highlights:
+            <ul>
+              <li><strong>677,154 protein-phenotype pairs</strong></li>
+              <li>48,920 unique phenotypes and 56,753 proteins, domains, and peptides </li>
+              <li>Captures phenotypic information for proteins across <strong>five knowledge domains</strong></li>
+            </ul>
 
-          We transform this data into an instruction
-          tuning dataset, expressing protein-phenotype pairs gathered from each database as a natural language instruction. To generate a larger diversity of text in the instructions, we leverage an external LLM
-          to rephrase the raw descriptions, resulting in a final dataset of <strong>33,899,528 instructions</strong> for training ProCyon models.
-        </h2>
-      </section>
+            We transform this data into an instruction
+            tuning dataset, expressing each protein-phenotype pair as a natural language instruction. To generate a larger diversity of text in the instructions, we leverage an external LLM
+            to rephrase the raw descriptions, resulting in a final dataset of <strong>33,899,528 instructions</strong> for training ProCyon models.
+          </h2>
+        </section>
+      </div>
     </div>
   </div>
 </section>
