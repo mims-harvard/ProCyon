@@ -104,5 +104,3 @@ def run_qa_eval(
     print("f1: {:.4f}".format(metrics["f1"]))
 
     return metrics
-
-    # Average for all scores:

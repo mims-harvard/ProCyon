@@ -146,17 +146,8 @@ class EvalArgs:
     qa_num_samples: int = field(
         default = None,
         metadata = {
-            "help": "Number of sampled batches (linearly scanning dataset) to run for QA evaluation"
-        }
-    )
-    qa_num_samples: int = field(
-        default = None,
-        metadata = {
             "help": "Number of samples (linearly scanning dataset) to run for QA evaluation"
         }
-    )
-    qa_sample_seed: int = field(
-        default = None,
     )
     caption_max_len: int = field(
         default = 64,

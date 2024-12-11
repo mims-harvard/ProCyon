@@ -8,11 +8,17 @@ from typing import (
     Union,
 )
 
-import torch
-import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import torch
 
+from sklearn.metrics import (
+    average_precision_score,
+    precision_recall_curve,
+    roc_auc_score,
+    roc_curve,
+)
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader
 
@@ -23,23 +29,14 @@ from procyon.data.dataset import (
     ProteinEvalDataset,
 )
 
-from procyon.evaluate.eval_utils import (
-    precision_recall_topk,
-)
 from procyon.evaluate.framework.args import EvalArgs
+from procyon.evaluate.framework.metrics import precision_recall_topk
 from procyon.evaluate.framework.utils import (
     calc_bootstrap_bounds,
     get_train_relations_for_eval_dataset,
     sum_dicts,
 )
 from procyon.training.training_args_IT import ModelArgs
-
-from sklearn.metrics import (
-    average_precision_score,
-    precision_recall_curve,
-    roc_auc_score,
-    roc_curve,
-)
 
 
 ALL_PROTEINS_FILE = os.path.join(
@@ -49,6 +46,7 @@ ALL_PROTEINS_FILE = os.path.join(
 ALL_DOMAINS_FILE = os.path.join(
     DATA_DIR, "integrated_data/v1/domain/domain_info_filtered.pkl"
 )
+
 
 class AbstractRetrievalModel:
     def __init__(
@@ -84,6 +82,7 @@ class AbstractRetrievalModel:
     ) -> torch.Tensor:
         raise Exception("not implemented")
 
+
 def get_retrieval_target_set(
     query_dataset: Union[AASeqTextUnifiedDataset, AASeqDataset],
     dataset_eval_args: Dict,
@@ -105,11 +104,14 @@ def get_retrieval_target_set(
         subset_path = dataset_eval_args["target_subset"]
         subset_ids = pd.read_pickle(subset_path).index.to_series()
         if not subset_ids.isin(target_ids).all():
-            raise ValueError(f"dataset {query_dataset.name()}: some IDs from the specified target "
-                             "subset were not found in the superset of IDs. You may need to set "
-                             "retrieval_eval_all_proteins = True or check for incorrect IDs.")
+            raise ValueError(
+                f"dataset {query_dataset.name()}: some IDs from the specified target "
+                "subset were not found in the superset of IDs. You may need to set "
+                "retrieval_eval_all_proteins = True or check for incorrect IDs."
+            )
         target_ids = subset_ids
     return target_ids
+
 
 def get_retrieval_target_proteins_loader(
     targets: pd.Series,
@@ -125,6 +127,7 @@ def get_retrieval_target_proteins_loader(
         shuffle=False,
         pin_memory=True,
     )
+
 
 def prep_for_retrieval_eval(
     query_dataset: Union[AASeqTextUnifiedDataset, AASeqDataset],
@@ -157,8 +160,12 @@ def prep_for_retrieval_eval(
 
     if is_ppi:
         # Have to reverse it because of the notation below (target_id, _, query_id)
-        relations = [(id2, rel, id1) for (id1, rel, id2) in query_dataset.aaseq_relations]
-        unique_queries = np.unique([id1 for (id1, rel, id2) in query_dataset.aaseq_relations]).tolist()
+        relations = [
+            (id2, rel, id1) for (id1, rel, id2) in query_dataset.aaseq_relations
+        ]
+        unique_queries = np.unique(
+            [id1 for (id1, rel, id2) in query_dataset.aaseq_relations]
+        ).tolist()
 
         num_queries = len(unique_queries)
     else:
@@ -170,8 +177,8 @@ def prep_for_retrieval_eval(
     unique_targets = np.unique(target_ids).tolist()
     assert len(unique_targets) == len(target_ids)
 
-    query_map = {query_id:i for i, query_id in enumerate(unique_queries)}
-    target_map = {target_id:i for i, target_id in enumerate(unique_targets)}
+    query_map = {query_id: i for i, query_id in enumerate(unique_queries)}
+    target_map = {target_id: i for i, target_id in enumerate(unique_targets)}
 
     labels_mat = torch.zeros((num_queries, num_targets))
     # When using a subset of targets (specified via `dataset_eval_args["target_subset"]`
@@ -184,7 +191,7 @@ def prep_for_retrieval_eval(
 
     # Relations (for AAseq <-> text) are stored as (seq_id, rel, text_id)
     # so in this case, the seq is the target and the text is the query.
-    for (target_id, _, query_id) in relations:
+    for target_id, _, query_id in relations:
         if target_id not in target_map:
             if not warned:
                 print(
@@ -204,16 +211,20 @@ def prep_for_retrieval_eval(
         train_relations = get_train_relations_for_eval_dataset(query_dataset)
 
         # Further filter train_relations based on GO and aaseq presence in split:
-        train_relations = train_relations.loc[train_relations.text_id.isin(unique_queries) & train_relations.seq_id.isin(unique_targets),:]
+        train_relations = train_relations.loc[
+            train_relations.text_id.isin(unique_queries)
+            & train_relations.seq_id.isin(unique_targets),
+            :,
+        ]
 
-        for (target_id, _, query_id) in train_relations.itertuples(index=False):
+        for target_id, _, query_id in train_relations.itertuples(index=False):
             query_idx = query_map[query_id]
             target_idx = target_map[target_id]
             labels_mat[query_idx, target_idx] = float("nan")
 
-    # TODO: Need to filter for PPI?
-
     return labels_mat, unique_queries, unique_targets
+
+
 
 def calc_and_plot_auroc_auprc(
     preds_mat: torch.Tensor,
@@ -223,13 +234,17 @@ def calc_and_plot_auroc_auprc(
 ) -> Tuple[float, float]:
     is_nan = torch.isnan(preds_mat)
     if is_nan.all().item():
-        print("Received all NaNs when calculating ROC and PRC "
-              "(this may be expected for some models with "
-              "downsampling, e.g. BLAST)")
+        print(
+            "Received all NaNs when calculating ROC and PRC "
+            "(this may be expected for some models with "
+            "downsampling, e.g. BLAST)"
+        )
         return 0, 0
     if is_nan.any().item():
-        print("NaNs found when calculating ROC and PRC "
-              "(this may be expected for some models, e.g. BLAST)")
+        print(
+            "NaNs found when calculating ROC and PRC "
+            "(this may be expected for some models, e.g. BLAST)"
+        )
         fill_val = preds_mat[~is_nan].min().item() - 1
         preds_mat = preds_mat.clone()
         preds_mat[is_nan] = fill_val
@@ -278,6 +293,7 @@ def calc_and_plot_auroc_auprc(
 
     return auroc, auprc, query_aurocs, query_auprcs
 
+
 def calc_retrieval_metrics_single(
     preds_mat: torch.Tensor,
     labels_mat: torch.Tensor,
@@ -289,18 +305,17 @@ def calc_retrieval_metrics_single(
     samples_dict = {}
     for k in eval_args.retrieval_top_k_vals:
         if k > labels_mat.shape[1]:
-            print(f"Number of candidate labels is {labels_mat.shape[1]} which is smaller than k={k}, so skipping this evaluation")
+            print(
+                f"Number of candidate labels is {labels_mat.shape[1]} which is smaller than k={k}, so skipping this evaluation"
+            )
             continue
-        (precision,
-         recall,
-         fmax,
-         per_query_precisions,
-         per_query_recalls,
-         fmaxes) = precision_recall_topk(
-            labels_mat,
-            preds_mat,
-            k,
-            return_all_vals=True,
+        (precision, recall, fmax, per_query_precisions, per_query_recalls, fmaxes) = (
+            precision_recall_topk(
+                labels_mat,
+                preds_mat,
+                k,
+                return_all_vals=True,
+            )
         )
 
         metrics[f"precision_k{k}"] = precision
@@ -312,10 +327,7 @@ def calc_retrieval_metrics_single(
     metrics[f"Fmax"] = fmax
     samples_dict[f"Fmax"] = fmaxes
 
-    (auroc,
-     auprc,
-     per_query_aurocs,
-     per_query_auprcs) = calc_and_plot_auroc_auprc(
+    (auroc, auprc, per_query_aurocs, per_query_auprcs) = calc_and_plot_auroc_auprc(
         preds_mat,
         labels_mat,
         output_dir,
@@ -328,6 +340,7 @@ def calc_retrieval_metrics_single(
     samples_dict["auprc"] = per_query_auprcs
 
     return metrics, samples_dict
+
 
 def calc_retrieval_metrics_class_balanced(
     preds_mat: torch.Tensor,
@@ -368,7 +381,9 @@ def calc_retrieval_metrics_class_balanced(
             pos_idxs = torch.argwhere(labels_mat[i] == 1).squeeze(-1)
             all_neg_idxs = torch.argwhere(labels_mat[i] == 0).squeeze(-1)
 
-            num_negs_to_sample = len(pos_idxs) * eval_args.retrieval_balanced_metrics_neg_per_pos
+            num_negs_to_sample = (
+                len(pos_idxs) * eval_args.retrieval_balanced_metrics_neg_per_pos
+            )
             # If the number of negatives we want is more than what's available, just calculate
             # metrics once.
             if len(all_neg_idxs) <= num_negs_to_sample:
@@ -380,22 +395,32 @@ def calc_retrieval_metrics_class_balanced(
                     size=num_negs_to_sample,
                 )
 
-            want_idxs = torch.cat((
-                torch.tensor(neg_idxs),
-                pos_idxs,
-            ))
+            want_idxs = torch.cat(
+                (
+                    torch.tensor(neg_idxs),
+                    pos_idxs,
+                )
+            )
             all_preds.append(preds_mat[i, want_idxs])
             all_labels.append(labels_mat[i, want_idxs])
             num_queries_evaluated += 1
 
         if sample_num == 0 and len(no_pos_labels) != 0:
-            print(f"retrieval eval: found {len(no_pos_labels)} queries with no positive labels: {no_pos_labels}")
+            print(
+                f"retrieval eval: found {len(no_pos_labels)} queries with no positive labels: {no_pos_labels}"
+            )
 
         if sample_num == 0 and len(all_nan_preds) != 0:
-            print(f"retrieval eval: found {len(all_nan_preds)} queries with all NaN predictions: {all_nan_preds}")
+            print(
+                f"retrieval eval: found {len(all_nan_preds)} queries with all NaN predictions: {all_nan_preds}"
+            )
 
-        sampled_preds = pad_sequence(all_preds, batch_first=True, padding_value=float("nan"))
-        sampled_labels = pad_sequence(all_labels, batch_first=True, padding_value=float("nan"))
+        sampled_preds = pad_sequence(
+            all_preds, batch_first=True, padding_value=float("nan")
+        )
+        sampled_labels = pad_sequence(
+            all_labels, batch_first=True, padding_value=float("nan")
+        )
 
         # Only generate plots for final sample.
         if sample_num == num_samples_per_query - 1:
@@ -416,6 +441,7 @@ def calc_retrieval_metrics_class_balanced(
     all_metrics["N"] = num_queries_evaluated
 
     return all_metrics, all_samples
+
 
 def calc_retrieval_metrics(
     preds_mat: torch.Tensor,
@@ -441,6 +467,7 @@ def calc_retrieval_metrics(
     raw_metrics.update(calc_bootstrap_bounds(samples))
     return raw_metrics
 
+
 def run_retrieval_eval(
     model: AbstractRetrievalModel,
     data_loader: DataLoader,
@@ -456,7 +483,9 @@ def run_retrieval_eval(
         eval_args,
         data_loader.dataset.aaseq_type,
     )
-    print(f"retrieval: evaluating model {model_name} on dataset {dataset_key} , num_queries={len(data_loader.dataset)}, num_targets={len(targets)}")
+    print(
+        f"retrieval: evaluating model {model_name} on dataset {dataset_key} , num_queries={len(data_loader.dataset)}, num_targets={len(targets)}"
+    )
     target_loader = get_retrieval_target_proteins_loader(
         targets,
         eval_args.batch_size,

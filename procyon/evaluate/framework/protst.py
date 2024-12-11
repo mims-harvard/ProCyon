@@ -7,15 +7,12 @@ from typing import (
 )
 
 import torch
-import tqdm
-
 import torch.nn.functional as F
-
-from tqdm import tqdm
-from torch.utils.data import DataLoader
-
 import torchdrug.data as td_data
+
+from torch.utils.data import DataLoader
 from torchdrug.utils import cuda
+from tqdm import tqdm
 
 from procyon.data.dataset import (
     AASeqDataset,
@@ -30,9 +27,6 @@ from procyon.evaluate.framework.retrieval import (
     AbstractRetrievalModel,
     get_retrieval_target_proteins_loader,
     get_retrieval_target_set,
-)
-from procyon.evaluate.framework.utils import (
-    move_inputs_to_device,
 )
 
 from procyon.evaluate.framework.baseline_models.protst import PretrainESM, PubMedBERT
@@ -168,8 +162,6 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         inds_full = model_input['input']['text']
         inds = [inds_full[i][-1] for i in range(len(inds_full))]
 
-        # TODO: do we want to prepend some descriptor, similar to how their prompts have
-        # "FUNCTION:" at the beginning?
         return [model_input['data']['text'][i] for i in inds]
 
     def _get_query_embeddings(
