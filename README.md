@@ -21,6 +21,8 @@ source ./procyon_venv/bin/activate
 
 # RECOMMENDED: use uv to install
 python3 -m pip install uv
+pyton3 -m uv sync --extra build
+pyton3 -m uv sync --extra build --extra compile
 python3 -m uv pip install -e .
 
 # OR if omitting uv

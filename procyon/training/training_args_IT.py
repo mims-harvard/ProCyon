@@ -1944,7 +1944,9 @@ def update_model_args_data_dir(model_args: ModelArgs):
         return
     print(f"updating model args DATA_DIR from {prev_data_dir} -> {DATA_DIR}")
     for field, curr_val in asdict(model_args).items():
-        if field.endswith("path") and (not field.startswith("peptide")):
+        if field.endswith("path"):
+            if curr_val is None:
+                continue
             if curr_val.startswith(prev_data_dir):
                 suffix = curr_val.replace(prev_data_dir, "").lstrip("/")
                 print(f"updating stale DATA_DIR for model arg: {field}")

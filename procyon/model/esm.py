@@ -3,7 +3,6 @@ import torch
 import time
 from functools import partial
 from torch import nn
-from torch_scatter import scatter_mean, scatter_max
 from procyon.training.train_utils import batched_split_long_seq, reverse_batched_split, concat_tensor_dict
 
 from procyon.model.external.esm import esm

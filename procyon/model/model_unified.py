@@ -2,7 +2,6 @@ import os
 import json
 import random
 
-from dataclasses import asdict
 from itertools import chain
 from typing import List
 
@@ -1354,10 +1353,7 @@ class UnifiedProCyon(nn.Module):
                 - Provided can change some internal model arguments
                 - Set enforce_checkpoint_architecture_strict=True if you want to assert that architecture arguments align
         '''
-        # Configs from models saved with older codes use old class definition, need to
-        # port over to more recent ModelArgs class.
         config_checkpoint = torch.load(os.path.join(checkpoint_dir, "model_args.pt"))
-        config_checkpoint = ModelArgs(**asdict(config_checkpoint))
 
         if config is None:
             config = config_checkpoint

@@ -5,11 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "procyon"
 version = "1.0"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 description = "A multimodal foundation model for protein phenotypes"
 readme = "README.md"
 dependencies = [
    "accelerate==0.27.2",
+   "biopython>=1.84",
    "captum==0.7.0",
    "datasets==2.20.0",
    "deepspeed==0.12.4",
@@ -45,19 +46,22 @@ dependencies = [
    "sentencepiece==0.1.99",
    "statsmodels==0.14.1",
    "tokenizers==0.13.3",
+   "torch-geometric>=2.6.1",
    "torch==2.2.0",
    "tqdm==4.66.4",
    "transformers==4.31.0",
    "umap-learn==0.5.5",
    "virtualenv==20.28.0",
    "wandb==0.16.3",
+   "flash-attn>=2.7.2.post1",
 ]
-
-#   "torch-cluster==1.6.3+pt22cu121
-#   "torch-geometric==2.5.0
-#   "torch-scatter==2.1.2+pt22cu121
-#   "torch-sparse==0.6.18+pt22cu121
-#    "flash-attn==2.5.3",
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[tool.uv]
+no-build-isolation-package = ["flash-attn"]
+
+[[tool.uv.dependency-metadata]]
+name = "flash-attn"
+requires-dist = ["torch", "einops"]
