@@ -19,9 +19,6 @@ from transformers.models.llama.configuration_llama import LlamaConfig
 from transformers.models.llama.modeling_llama import add_start_docstrings_to_model_forward, LLAMA_INPUTS_DOCSTRING, LlamaModel, LlamaDecoderLayer, LlamaAttention
 from transformers.models.llama.modeling_llama import apply_rotary_pos_emb, repeat_kv
 
-from streaming_llm.pos_shift.modify_llama import llama_pos_shift_attention_forward, enable_llama_pos_shift_attention
-from streaming_llm.enable_streaming_llm import enable_streaming_llm
-from deepspeed.checkpoint.utils import clone_tensors_for_torch_save
 from procyon.model.mlora import MoLoRAConfig, get_moepeft_model
 import math
 
@@ -472,11 +469,6 @@ class LlamaPostTokenization(nn.Module):
                 self.model = PiplineLlamaForCausalLM.from_pretrained(
                     model_path, config=config, attention_type = attention_type, quantization_config=bnb_config
                 )
-            elif "streaming_llm" in attention_type:
-                attention_type = 'vanilla'
-                self.model = PiplineLlamaForCausalLM.from_pretrained(model_path, config=config, quantization_config=bnb_config)
-                print(f"Enable Streaming LLM Attention Policy")
-                self.kv_cache = enable_streaming_llm(self.model, start_size=4, recent_size = 2000)
             else:
                 self.model = PiplineLlamaForCausalLM.from_pretrained(
                     model_path, config=config, attention_type = attention_type, quantization_config=bnb_config
@@ -486,10 +478,6 @@ class LlamaPostTokenization(nn.Module):
                 self.model = transformers.AutoModelForCausalLM.from_pretrained('meta-llama/Meta-Llama-3-8B', cache_dir = f"{DATA_DIR}/model_weights/llama-3-8b")
             else:
                 self.model = transformers.LlamaForCausalLM.from_pretrained(model_path, config=config, quantization_config=bnb_config)
-            if "streaming_llm" in attention_type:
-                self.model = transformers.LlamaForCausalLM.from_pretrained(model_path, config=config, quantization_config=bnb_config)
-                print(f"Enable Streaming LLM Attention Policy")
-                self.kv_cache = enable_streaming_llm(self.model, start_size=4, recent_size = 2000)
         # for pn, p in self.model.named_parameters():
         #     print(pn, p.requires_grad)
 
@@ -571,13 +559,6 @@ class LlamaPostTokenization(nn.Module):
         # Verify correct tokenization
         # final_token_idxs = np.arange(len(input_ids)), simcse.get_final_token_indices(attn_masks)
         # assert all(input_ids[final_token_idxs] == self.tokenizer.sep_token_id)
-        if "streaming_llm" in self.attention_type:
-            max_gen_len = 50 # as a config, TODO
-            past_key_values = None
-            if self.kv_cache is not None:
-                space_needed = input_embeds.shape[1] + max_gen_len
-                past_key_values = self.kv_cache.evict_for_space(past_key_values, space_needed)
-        # If else, passes and uses past_key_values
 
         if input_embeds is not None:
             outputs = self.model(
