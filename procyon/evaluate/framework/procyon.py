@@ -45,6 +45,7 @@ from procyon.evaluate.framework.utils import (
 
 from procyon.training.train_utils import get_qa_scores
 
+
 class ProcyonCaptionEval(AbstractCaptionModel):
     def __init__(
         self,
@@ -70,7 +71,9 @@ class ProcyonCaptionEval(AbstractCaptionModel):
         self.method = model_config.get("generation_method", "beam")
         self.num_captions = model_config.get("num_captions", 5)
         self.beam_group_size = model_config.get("beam_group_size", 2)
-        self.beam_size = model_config.get("beam_size", self.num_captions*self.beam_group_size)
+        self.beam_size = model_config.get(
+            "beam_size", self.num_captions * self.beam_group_size
+        )
 
     @torch.no_grad()
     def get_predictions(
@@ -91,17 +94,22 @@ class ProcyonCaptionEval(AbstractCaptionModel):
                 beam_group_size=self.beam_group_size,
                 truncate_on_eos=True,
             )
-            for i, indices in enumerate(model_inputs["reference_indices"]["input"]["seq"]):
+            for i, indices in enumerate(
+                model_inputs["reference_indices"]["input"]["seq"]
+            ):
                 aaseq_index = indices[-1]
 
                 for j in range(self.num_captions):
                     aaseq_indices.append(aaseq_index)
-                    generated_captions.append(captions[i][(j*self.beam_group_size)])
+                    generated_captions.append(captions[i][(j * self.beam_group_size)])
 
-        return pd.DataFrame({
-            "seq_id": aaseq_indices,
-            "generated_caption": generated_captions,
-        })
+        return pd.DataFrame(
+            {
+                "seq_id": aaseq_indices,
+                "generated_caption": generated_captions,
+            }
+        )
+
 
 class ProcyonQAEval(AbstractQAModel):
     def __init__(
@@ -134,20 +142,22 @@ class ProcyonQAEval(AbstractQAModel):
     def get_predictions(
         self,
         data_loader: DataLoader,
-        aaseq_type: str = 'protein',
+        aaseq_type: str = "protein",
     ) -> Dict[str, torch.Tensor]:
 
         results_dict = defaultdict(list)
 
         samples_to_hit = None
         if self.num_samples is not None:
-            if self.num_samples < len(data_loader): # Keep None if we don't need to downsample
+            if self.num_samples < len(
+                data_loader
+            ):  # Keep None if we don't need to downsample
                 samples_to_hit = self.rng.choice(
                     np.arange(len(data_loader)),
                     size=self.num_samples,
                     replace=False,
                 )
-                samples_to_hit = set(samples_to_hit) # Faster lookup
+                samples_to_hit = set(samples_to_hit)  # Faster lookup
 
         # Where the index of the actual text query is depends on whether or not
         # this is a dataset with context augmentation.
@@ -163,21 +173,26 @@ class ProcyonQAEval(AbstractQAModel):
                     continue
             out = self.model(
                 move_inputs_to_device(model_inputs, self.device),
-                return_mlm = False,
-                retrieval = False,
-                get_full_labels = True,
-                aaseq_type = aaseq_type,
-                crop_off = True # OWEN: HARDCODED - COULD REMOVE LATER OR MAKE AN OPTION
+                return_mlm=False,
+                retrieval=False,
+                get_full_labels=True,
+                aaseq_type=aaseq_type,
+                crop_off=True,  # OWEN: HARDCODED - COULD REMOVE LATER OR MAKE AN OPTION
             )
 
             seq_ids = [x[-1] for x in model_inputs["reference_indices"]["input"]["seq"]]
-            text_ids = [x[query_text_idx] for x in model_inputs["reference_indices"]["input"]["text"]]
+            text_ids = [
+                x[query_text_idx]
+                for x in model_inputs["reference_indices"]["input"]["text"]
+            ]
 
             # Workaround because in eval, we take out the yes/no in the instructions
             y_text = model_inputs["target"]["text"]
-            y_toks = torch.LongTensor([(self.yes_token if y=="yes" else self.no_token) for y in y_text])
+            y_toks = torch.LongTensor(
+                [(self.yes_token if y == "yes" else self.no_token) for y in y_text]
+            )
 
-            pred_toks, _ = get_qa_scores(out, answer_token = self.model.answer_idx)
+            pred_toks, _ = get_qa_scores(out, answer_token=self.model.answer_idx)
 
             results_dict["seq_ids"].extend(seq_ids)
             results_dict["text_ids"].extend(text_ids)
@@ -188,6 +203,7 @@ class ProcyonQAEval(AbstractQAModel):
         results_dict["y"] = torch.cat(results_dict["y"])
 
         return results_dict
+
 
 class ProcyonRetrievalEval(AbstractRetrievalModel):
     def __init__(
@@ -201,7 +217,7 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         model, checkpoint_model_args = UnifiedProCyon.from_pretrained(
             pretrained_weights_dir=DEFAULT_PRETRAINED_WEIGHTS_DIR,
             checkpoint_dir=checkpoint_dir,
-            strict_load = False, # Must set to false because we don't store non-tuned weights
+            strict_load=False,  # Must set to false because we don't store non-tuned weights
         )
         compare_and_warn_model_args(model_args, checkpoint_model_args)
 
@@ -212,7 +228,9 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         self.model_args = model_args
         self.batch_size = eval_args.batch_size
         self.checkpoint_dir = checkpoint_dir
-        self.use_cached_target_embeddings = eval_args.retrieval_use_cached_target_embeddings
+        self.use_cached_target_embeddings = (
+            eval_args.retrieval_use_cached_target_embeddings
+        )
 
     @torch.no_grad()
     def _get_query_embeddings(
@@ -225,7 +243,7 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         elif isinstance(query_loader.dataset, AASeqDataset):
             is_ppi = True
         else:
-           raise ValueError(f"unexpected dataset type: {type(query_loader.dataset)}")
+            raise ValueError(f"unexpected dataset type: {type(query_loader.dataset)}")
 
         query_embeddings = []
         query_ids = []
@@ -239,12 +257,14 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
             # Where the query ID is stored depending on whether the query
             # is text or sequence (i.e. PPI)
             if is_ppi:
-                query_ids += [x[-1] for x in model_inputs["reference_indices"]["input"]["seq"]]
+                query_ids += [
+                    x[-1] for x in model_inputs["reference_indices"]["input"]["seq"]
+                ]
             else:
-                query_ids += [x[-1] for x in model_inputs["reference_indices"]["input"]["text"]]
+                query_ids += [
+                    x[-1] for x in model_inputs["reference_indices"]["input"]["text"]
+                ]
 
-            # TODO: Verify that this is the correct way to get embeddings
-            # for a retrieval query, especially for aaseq queries (i.e. PPI)
             out = self.model(
                 model_inputs,
                 retrieval=True,
@@ -265,8 +285,7 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         # Theoretically the embeddings should be similar for each occurence, but
         # likely differ slightly due to potentially different in-context examples
         # provided.
-        #import ipdb; ipdb.set_trace()
-        query_idxs = {query_id:idx for idx, query_id in enumerate(query_ids)}
+        query_idxs = {query_id: idx for idx, query_id in enumerate(query_ids)}
         rearrange_idxs = [query_idxs[query_id] for query_id in query_order]
         query_embeddings = torch.cat(query_embeddings, dim=0)[rearrange_idxs]
         return query_embeddings
@@ -276,7 +295,7 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         self,
         target_loader: DataLoader,
         collate_fn: Callable,
-        aaseq_type = "protein",
+        aaseq_type="protein",
     ) -> Tuple[torch.Tensor, List]:
         target_protein_embeddings = []
         target_ids = []
@@ -296,7 +315,7 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
             model_inputs = move_inputs_to_device(model_inputs, self.device)
             target_ids += protein_ids.tolist()
 
-            out = self.model.forward_sequences(model_inputs, aaseq_type = aaseq_type)
+            out = self.model.forward_sequences(model_inputs, aaseq_type=aaseq_type)
             target_protein_embeddings.append(out["shared"].detach().clone().cpu())
 
         target_protein_embeddings = torch.cat(target_protein_embeddings, dim=0)
@@ -308,25 +327,28 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         aaseq_type: str,
     ):
         print("loading cached target embeddings")
-        target_embeddings_path = os.path.join(self.checkpoint_dir, f"{aaseq_type}_target_embeddings.pkl")
+        target_embeddings_path = os.path.join(
+            self.checkpoint_dir, f"{aaseq_type}_target_embeddings.pkl"
+        )
         if not os.path.exists(target_embeddings_path):
             print(
                 f"retrieval_use_cached_target_embeddings is set to True but cached "
                 f"embeddings not found, calculating and writing to: {target_embeddings_path}"
             )
             all_targets = get_retrieval_target_set(
-                        None,
-                        {},
-                        EvalArgs(retrieval_eval_all_aaseqs=True),
-                        aaseq_type=aaseq_type,
+                None,
+                {},
+                EvalArgs(retrieval_eval_all_aaseqs=True),
+                aaseq_type=aaseq_type,
             )
             target_loader = get_retrieval_target_proteins_loader(
                 all_targets,
                 self.batch_size,
             )
 
-            target_protein_embeddings, target_ids = self._calculate_target_embeddings(target_loader, collate_fn,
-                aaseq_type = aaseq_type)
+            target_protein_embeddings, target_ids = self._calculate_target_embeddings(
+                target_loader, collate_fn, aaseq_type=aaseq_type
+            )
             with open(target_embeddings_path, "wb") as fh:
                 torch.save((target_protein_embeddings, target_ids), fh)
         else:
@@ -342,16 +364,16 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         aaseq_type: str,
     ) -> torch.Tensor:
         if self.use_cached_target_embeddings:
-            target_protein_embeddings, target_ids = self._get_cached_target_embeddings(collate_fn, aaseq_type)
+            target_protein_embeddings, target_ids = self._get_cached_target_embeddings(
+                collate_fn, aaseq_type
+            )
         else:
             target_protein_embeddings, target_ids = self._calculate_target_embeddings(
-                target_loader,
-                collate_fn,
-                aaseq_type = aaseq_type
+                target_loader, collate_fn, aaseq_type=aaseq_type
             )
 
         # Rearrange to expected order and/or subset down to just the targets of interest.
-        target_idxs = {target_id:idx for idx, target_id in enumerate(target_ids)}
+        target_idxs = {target_id: idx for idx, target_id in enumerate(target_ids)}
         rearrange_idxs = [target_idxs[target_id] for target_id in target_order]
         target_protein_embeddings = target_protein_embeddings[rearrange_idxs]
         return target_protein_embeddings
@@ -368,10 +390,6 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         query_embeddings = self._get_query_embeddings(query_loader, query_order)
 
         # Get embeddings of set of target proteins.
-        # NOTE: Somewhat hacky that we're using the collator from the query loader,
-        # can we move this out to a separate object at some point?
-        # I think this may also mean we're storing all the raw protein sequences
-        # once for each instantiated collator fxn.
         target_embeddings = self._get_target_embeddings(
             target_loader,
             target_order,
@@ -380,8 +398,6 @@ class ProcyonRetrievalEval(AbstractRetrievalModel):
         )
 
         # Normalize embeddings and calculate cosine similarities.
-        # TODO: Does normalizing and calculating cosine sim make the most sense here
-        # or do we want Eucldiean distance of raw embeddings?
         query_embs_normalized = F.normalize(query_embeddings)
         target_embs_normalized = F.normalize(target_embeddings)
         # Dims like: num_queries X num_targets

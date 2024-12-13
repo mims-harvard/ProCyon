@@ -35,7 +35,7 @@ from procyon.evaluate.framework.knn import (
     ESM3KnnRetrievalEval,
     ESM3KnnQAEval,
     GearNetKnnRetrievalEval,
-    GearNetKnnQAEval
+    GearNetKnnQAEval,
 )
 from procyon.evaluate.framework.mlp import (
     ESMMLPRetrievalEval,
@@ -43,7 +43,7 @@ from procyon.evaluate.framework.mlp import (
     ESM3MLPRetrievalEval,
     ESM3MLPQAEval,
     GearNetMLPRetrievalEval,
-    GearNetMLPQAEval
+    GearNetMLPQAEval,
 )
 
 if sys.version_info[1] <= 10:
@@ -63,7 +63,7 @@ from procyon.evaluate.framework.random import (
     MajorityRuleRandomRetrievalEval,
 )
 
-#from procyon.evaluate.framework.ProtLLMQA import ProtLLMQAEval
+# from procyon.evaluate.framework.ProtLLMQA import ProtLLMQAEval
 
 caption_models = {
     "ProCyon": ProcyonCaptionEval,
@@ -100,7 +100,7 @@ qa_models = {
     "ESMMLP": ESMMLPQAEval,
     "ESM3MLP": ESM3MLPQAEval,
     "GearNetMLP": GearNetMLPQAEval,
-#    "ProtLLM": ProtLLMQAEval,
+    #    "ProtLLM": ProtLLMQAEval,
 }
 
 model_zoo = {
@@ -134,7 +134,7 @@ def run_evaluation(
     #  2. Run each dataset through given model for associated tasks.
     #  3. Output evaluation metrics per task and per dataset.
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Check if we want to override ModelArgs using a ProCyon checkpoint
     if eval_args.model_args_from_checkpoint != "":
@@ -160,12 +160,12 @@ def run_evaluation(
     # Check if we want to override any of the DataArgs or ModelArgs values parsed
     # from the model checkpoint.
     if eval_args.override_model_data_args_yml is not None:
-        override_data_and_model_args(data_args, model_args, eval_args.override_model_data_args_yml)
+        override_data_and_model_args(
+            data_args, model_args, eval_args.override_model_data_args_yml
+        )
 
     # Parse model specifications.
     models = load_and_validate_model_args(eval_args.models_config_yml)
-
-    #import ipdb; ipdb.set_trace()
 
     # Load datasets
     datasets, collators, dataset_eval_args = load_datasets_for_eval(
@@ -207,9 +207,10 @@ def run_evaluation(
         eval_func = task_evals[task]
 
         for model_name, args in models.items():
-            #model = model_zoo[task][model_name](args, eval_args)
-            if model_name.lower() == 'protst':
-                assert (sys.version_info[1] <= 10), "ProtST not compatible with Python >3.10, please change version"
+            if model_name.lower() == "protst":
+                assert (
+                    sys.version_info[1] <= 10
+                ), "ProtST not compatible with Python >3.10, please change version"
 
             model = model_zoo[task][model_name](args, eval_args, model_args, device)
 
@@ -229,7 +230,7 @@ def run_evaluation(
                     model_name,
                     dataset_key,
                     dataset_results_dir,
-                    )
+                )
 
                 # NOTE: moved inside here, will intermediately write metrics for fault tolerance
                 all_results[task] = task_results
@@ -237,6 +238,5 @@ def run_evaluation(
 
         all_results[task] = task_results
 
-    # NOTE: moved inside here, will intermediately write metrics
     write_metrics(all_results, eval_args.output_dir)
     return all_results

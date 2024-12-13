@@ -34,16 +34,15 @@ from procyon.data.it_data_config import (
     expand_datasets_on_splits,
     ITMultiDatasetConfig,
 )
-from procyon.training.training_args_IT import (
-    DataArgs,
-    ModelArgs
-)
+from procyon.training.training_args_IT import DataArgs, ModelArgs
 
 from procyon.data.dataset import get_and_check_relation_id
 
+
 def sum_dicts(lhs: Dict, rhs: Dict):
-    for k,v in rhs.items():
+    for k, v in rhs.items():
         lhs[k] += v
+
 
 def move_inputs_to_device(
     data: Union[torch.Tensor, Any],
@@ -53,12 +52,15 @@ def move_inputs_to_device(
     Prepares one `data` before feeding it to the model, be it a tensor or a nested list/dictionary of tensors.
     """
     if isinstance(data, Mapping):
-        return type(data)({k: move_inputs_to_device(v, device) for k, v in data.items()})
+        return type(data)(
+            {k: move_inputs_to_device(v, device) for k, v in data.items()}
+        )
     elif isinstance(data, (tuple, list)):
         return type(data)(move_inputs_to_device(v, device) for v in data)
     elif isinstance(data, torch.Tensor):
         return data.to(device=device)
     return data
+
 
 def calc_bootstrap_bounds(
     metric_samples: Dict,
@@ -80,7 +82,7 @@ def calc_bootstrap_bounds(
             x, y = zip(*samples)
             inputs = (x, y)
         else:
-            inputs = (samples, )
+            inputs = (samples,)
         res = bootstrap(
             inputs,
             statistic=statistic,
@@ -95,6 +97,7 @@ def calc_bootstrap_bounds(
 
     return bounds
 
+
 def compare_and_warn_model_args(
     model_args_a: ModelArgs,
     model_args_b: ModelArgs,
@@ -103,7 +106,7 @@ def compare_and_warn_model_args(
 
     ModelArgs also contains some parameters used for dataset loading and
     collating, so having a mismatch between what's specified for evaluation
-    and what was specified when training a TxPLM model can create odd crashes
+    and what was specified when training a ProCyon model can create odd crashes
     and unexpected behavior. We want to warn if the two sets of ModelArgs
     mismatch, but also want to ignore some fields that are expected to be
     different.
@@ -129,11 +132,12 @@ def compare_and_warn_model_args(
     if len(mismatches) != 0:
         mismatches_print = [f"{x[0]}: {x[1]} != {x[2]}" for x in mismatches]
         print(
-            "Specified ModelArgs do not match those used in provided TxPLM checkpoint "
+            "Specified ModelArgs do not match those used in provided ProCyon checkpoint "
             "this may cause crashes or unexpected behavior. Use the EvalArgs.model_args_from_checkpoint "
             "command-line argument unless you're sure you want to do this, comment this out.\n"
             f"Mismatched fields: {' , '.join(mismatches_print)}"
         )
+
 
 def override_data_and_model_args(
     data_args: DataArgs,
@@ -152,6 +156,7 @@ def override_data_and_model_args(
             old_val = getattr(model_args, name)
             setattr(model_args, name, val)
             print(f"overriding DataArg: {name}: {old_val} -> {val}")
+
 
 def load_datasets_for_eval(
     data_args: DataArgs,
@@ -175,7 +180,9 @@ def load_datasets_for_eval(
 
     config = ITMultiDatasetConfig.load_from_yaml(data_args.it_data_config_yml)
     if separate_splits:
-        config.testing_datasets = expand_datasets_on_splits(config.testing_datasets, keep_splits_union)
+        config.testing_datasets = expand_datasets_on_splits(
+            config.testing_datasets, keep_splits_union
+        )
 
     it_datasets, it_collators = config.get_datasets_and_collators(
         data_args,
@@ -187,6 +194,7 @@ def load_datasets_for_eval(
     )
     dataset_eval_args = config.get_eval_args_by_dataset()
     return it_datasets, it_collators, dataset_eval_args
+
 
 def load_eval_data_loaders(
     data_args: DataArgs,
@@ -226,7 +234,7 @@ def load_eval_data_loaders(
                 num_workers=num_workers,
                 pin_memory=True,
                 drop_last=False,
-        )
+            )
     return data_loaders
 
 
@@ -242,9 +250,12 @@ def load_and_validate_model_args(
     model_args = {}
     for model_specs in raw_data:
         this_model_args = model_specs.get("args", {})
-        assert isinstance(this_model_args, dict), f"expected dict, got {type(this_model_args)}"
+        assert isinstance(
+            this_model_args, dict
+        ), f"expected dict, got {type(this_model_args)}"
         model_args[model_specs["model_name"]] = this_model_args
     return model_args
+
 
 def write_metrics(
     metrics: Dict,
@@ -261,55 +272,67 @@ def write_metrics(
         path = os.path.join(output_dir, f"{task}_metrics.tsv")
         task_metrics = []
         for model_name, model_metrics in results.items():
-            df = (pd.DataFrame(model_metrics)
-                .T
-                .rename_axis(index="dataset")
+            df = (
+                pd.DataFrame(model_metrics)
+                .T.rename_axis(index="dataset")
                 .reset_index()
-                .assign(model=model_name))
+                .assign(model=model_name)
+            )
 
             # Move model and dataset cols to front.
-            df = df[["model", "dataset"] + [col for col in df.columns if col not in ["model", "dataset"]] ]
+            df = df[
+                ["model", "dataset"]
+                + [col for col in df.columns if col not in ["model", "dataset"]]
+            ]
             task_metrics.append(df)
 
         task_metrics = pd.concat(task_metrics)
         with open(path, "w") as fh:
             task_metrics.to_csv(fh, index=False, sep="\t")
 
-def get_train_relations_for_eval_dataset(eval_dataset, training_splits = ["CL_train"]):
-    '''
+
+def get_train_relations_for_eval_dataset(eval_dataset, training_splits=["CL_train"]):
+    """
     Gets relations in the train splits for a given eval dataset
         - At high level, extracts needed information from eval_dataset to get training relations,
             returns aaseq_text_relations but for the training data
-    '''
+    """
     data_dir = eval_dataset.data_dir
     aaseq_type = eval_dataset.aaseq_type
     text_type = eval_dataset.text_type
     text_split_method = eval_dataset.text_split_method
-    all_relations = pd.read_csv(os.path.join(data_dir,
-                                                "integrated_data",
-                                                "v1",
-                                                f"{aaseq_type}_{text_type}",
-                                                text_split_method,
-                                                f"{aaseq_type}_{text_type}_relations_indexed.unified.csv"))
+    all_relations = pd.read_csv(
+        os.path.join(
+            data_dir,
+            "integrated_data",
+            "v1",
+            f"{aaseq_type}_{text_type}",
+            text_split_method,
+            f"{aaseq_type}_{text_type}_relations_indexed.unified.csv",
+        )
+    )
 
     # Filter down to train:
     # Filter relation type + train split
     if eval_dataset.relation_type != "all":
         # Filter dataframe by relation:
-        if eval_dataset.text_type != 'go':
+        if eval_dataset.text_type != "go":
             valid_rel = get_and_check_relation_id(
                 eval_dataset.data_dir, eval_dataset.relation_type
             )
             all_relations = all_relations.loc[lambda x: x.relation == valid_rel]
         else:
-            all_relations = all_relations.loc[lambda x: x.text_type.str.lower() == eval_dataset.relation_type.lower()]
+            all_relations = all_relations.loc[
+                lambda x: x.text_type.str.lower() == eval_dataset.relation_type.lower()
+            ]
 
     # Now train:
-    train_relations = (all_relations
-                         .loc[lambda x: x.split.isin(training_splits)]
-                         [["seq_id", "relation", "text_id"]])
+    train_relations = all_relations.loc[lambda x: x.split.isin(training_splits)][
+        ["seq_id", "relation", "text_id"]
+    ]
 
     return train_relations
+
 
 def get_dataset_alternate_splits(
     dataset: Union[AASeqTextUnifiedDataset, AASeqDataset],
@@ -339,6 +362,7 @@ def get_dataset_alternate_splits(
         raise ValueError(f"unexpected dataset type: {type(dataset)}")
     return new_dataset
 
+
 def extract_qa_data(
     data_loader: DataLoader,
 ) -> Tuple[List[Tuple[int, int]], List[str]]:
@@ -355,12 +379,15 @@ def extract_qa_data(
     ground_truth = []
     for batch in tqdm(data_loader):
         seq_idxs = [x[-1] for x in batch["reference_indices"]["input"]["seq"]]
-        text_idxs = [x[query_text_idx] for x in batch["reference_indices"]["input"]["text"]]
+        text_idxs = [
+            x[query_text_idx] for x in batch["reference_indices"]["input"]["text"]
+        ]
 
         aaseq_text_pairs.extend(zip(seq_idxs, text_idxs))
 
         ground_truth.extend(batch["target"]["text"])
     return aaseq_text_pairs, ground_truth
+
 
 def optimal_qa_thresh_acc(
     yes_probs: np.ndarray,

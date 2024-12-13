@@ -225,7 +225,6 @@ def prep_for_retrieval_eval(
     return labels_mat, unique_queries, unique_targets
 
 
-
 def calc_and_plot_auroc_auprc(
     preds_mat: torch.Tensor,
     labels_mat: torch.Tensor,

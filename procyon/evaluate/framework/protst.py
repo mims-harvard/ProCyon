@@ -31,13 +31,14 @@ from procyon.evaluate.framework.retrieval import (
 
 from procyon.evaluate.framework.baseline_models.protst import PretrainESM, PubMedBERT
 
+
 class ProtSTRetrievalEval(AbstractRetrievalModel):
     def __init__(
         self,
         model_config: Dict,
         eval_args: EvalArgs,
         model_args: ModelArgs,
-        device: torch.device
+        device: torch.device,
     ):
 
         #############################
@@ -63,21 +64,23 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         )
         if not os.path.exists(pubmedbert_path):
             raise Exception(
-                  f"PubMedBERT-abs weights not found at {pubmedbert_path} , you can download them by running:\n"
-                  f"  cd {os.path.dirname(pubmedbert_path)}\n"
-                  "   git clone https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract"
+                f"PubMedBERT-abs weights not found at {pubmedbert_path} , you can download them by running:\n"
+                f"  cd {os.path.dirname(pubmedbert_path)}\n"
+                "   git clone https://huggingface.co/microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract"
             )
         if not os.path.exists(protst_path):
             raise Exception(
-                  f"ProtST weights not found at {protst_path} , you can download them from "
-                  "https://github.com/DeepGraphLearning/ProtST/blob/main/README.md#pre-trained-model-zoo"
+                f"ProtST weights not found at {protst_path} , you can download them from "
+                "https://github.com/DeepGraphLearning/ProtST/blob/main/README.md#pre-trained-model-zoo"
             )
 
         # Max prompt length of 128 used by ProtST for text-to-protein retrieval, but we
         # may want to bump this up as it's quite small.
         max_len = model_config.get("max_prompt_len", 128)
         if max_len > 512:
-            raise ValueError(f"ProtST: max_prompt_len={max_len} is greater than max context length of 512")
+            raise ValueError(
+                f"ProtST: max_prompt_len={max_len} is greater than max context length of 512"
+            )
 
         # Initialize the two models (Pretrained ESM, and PubMedBERT)
 
@@ -94,12 +97,12 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         #      73                     "Got {}".format(torch.typename(name)))
         #      74 elif '.' in name:
         # AttributeError: module 'torch' has no attribute '_six'
-        protein_model = PretrainESM(path=esm_path ,model='ESM-1b')
+        protein_model = PretrainESM(path=esm_path, model="ESM-1b")
         text_model = PubMedBERT(
-            model='PubMedBERT-abs',
+            model="PubMedBERT-abs",
             path=pubmedbert_path,
             output_dim=512,
-            readout='mean',
+            readout="mean",
         )
 
         # Load the weights from the pretrained ProtST
@@ -131,7 +134,9 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         self.text_model = text_model
         self.device = device
         self.batch_size = eval_args.batch_size
-        self.use_cached_target_embeddings = eval_args.retrieval_use_cached_target_embeddings
+        self.use_cached_target_embeddings = (
+            eval_args.retrieval_use_cached_target_embeddings
+        )
         self.checkpoint_dir = os.path.dirname(protst_path)
         self.max_len = max_len
 
@@ -149,20 +154,24 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
                 add_special_tokens=False,
             )
             prompt_token = [self.text_model.cls_idx] + prompt_token
-            prompt_token = torch.tensor(prompt_token, dtype=torch.long, device=self.text_model.device).unsqueeze(0)
+            prompt_token = torch.tensor(
+                prompt_token, dtype=torch.long, device=self.text_model.device
+            ).unsqueeze(0)
 
             attention_mask = prompt_token != self.text_model.pad_idx
-            model_output = self.text_model(None, input_ids=prompt_token, attention_mask=attention_mask)
+            model_output = self.text_model(
+                None, input_ids=prompt_token, attention_mask=attention_mask
+            )
             prompt_feature.append(model_output["text_feature"])
 
         prompt_feature = torch.cat(prompt_feature, dim=0)
         return prompt_feature.detach().cpu()
 
     def _extract_text(self, model_input):
-        inds_full = model_input['input']['text']
+        inds_full = model_input["input"]["text"]
         inds = [inds_full[i][-1] for i in range(len(inds_full))]
 
-        return [model_input['data']['text'][i] for i in inds]
+        return [model_input["data"]["text"][i] for i in inds]
 
     def _get_query_embeddings(
         self,
@@ -170,21 +179,25 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         query_order: List,
     ) -> torch.Tensor:
         if isinstance(query_loader.dataset, AASeqDataset):
-           raise ValueError(f"ProtST only supports text->protein retrieval, received PPI dataset")
+            raise ValueError(
+                f"ProtST only supports text->protein retrieval, received PPI dataset"
+            )
         elif not isinstance(query_loader.dataset, AASeqTextUnifiedDataset):
-           raise ValueError(f"unexpected dataset type: {type(query_loader.dataset)}")
+            raise ValueError(f"unexpected dataset type: {type(query_loader.dataset)}")
 
         query_embeddings = []
         query_ids = []
         for model_inputs in tqdm(query_loader):
             # Where the query ID is stored depending on whether the query
             # is text or sequence (i.e. PPI)
-            query_ids += [x[-1] for x in model_inputs["reference_indices"]["input"]["text"]]
+            query_ids += [
+                x[-1] for x in model_inputs["reference_indices"]["input"]["text"]
+            ]
 
             text_inputs = self._extract_text(model_inputs)
             query_embeddings.append(self._get_text_embedding(text_inputs))
 
-        query_idxs = {query_id:idx for idx, query_id in enumerate(query_ids)}
+        query_idxs = {query_id: idx for idx, query_id in enumerate(query_ids)}
         rearrange_idxs = [query_idxs[query_id] for query_id in query_order]
         query_embeddings = torch.cat(query_embeddings, dim=0)[rearrange_idxs]
         return query_embeddings
@@ -225,24 +238,28 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         aaseq_type: str,
     ):
         print("ProtST: loading cached target embeddings")
-        target_embeddings_path = os.path.join(self.checkpoint_dir, f"{aaseq_type}_target_embeddings.pkl")
+        target_embeddings_path = os.path.join(
+            self.checkpoint_dir, f"{aaseq_type}_target_embeddings.pkl"
+        )
         if not os.path.exists(target_embeddings_path):
             print(
                 f"ProtST: retrieval_use_cached_target_embeddings is set to True but cached "
                 f"embeddings not found, calculating and writing to: {target_embeddings_path}"
             )
             all_targets = get_retrieval_target_set(
-                        None,
-                        {},
-                        EvalArgs(retrieval_eval_all_aaseqs=True),
-                        aaseq_type=aaseq_type,
+                None,
+                {},
+                EvalArgs(retrieval_eval_all_aaseqs=True),
+                aaseq_type=aaseq_type,
             )
             target_loader = get_retrieval_target_proteins_loader(
                 all_targets,
                 self.batch_size,
             )
 
-            target_protein_embeddings, target_ids = self._calculate_target_embeddings(target_loader, collate_fn)
+            target_protein_embeddings, target_ids = self._calculate_target_embeddings(
+                target_loader, collate_fn
+            )
             with open(target_embeddings_path, "wb") as fh:
                 torch.save((target_protein_embeddings, target_ids), fh)
         else:
@@ -258,7 +275,9 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         aaseq_type: str,
     ) -> torch.Tensor:
         if self.use_cached_target_embeddings:
-            target_protein_embeddings, target_ids = self._get_cached_target_embeddings(collate_fn, aaseq_type)
+            target_protein_embeddings, target_ids = self._get_cached_target_embeddings(
+                collate_fn, aaseq_type
+            )
         else:
             target_protein_embeddings, target_ids = self._calculate_target_embeddings(
                 target_loader,
@@ -266,7 +285,7 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
             )
 
         # Rearrange to expected order and/or subset down to just the targets of interest.
-        target_idxs = {target_id:idx for idx, target_id in enumerate(target_ids)}
+        target_idxs = {target_id: idx for idx, target_id in enumerate(target_ids)}
         rearrange_idxs = [target_idxs[target_id] for target_id in target_order]
         target_protein_embeddings = target_protein_embeddings[rearrange_idxs]
         return target_protein_embeddings
@@ -283,10 +302,6 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         query_embeddings = self._get_query_embeddings(query_loader, query_order)
 
         # Get embeddings of set of target proteins.
-        # NOTE: Somewhat hacky that we're using the collator from the query loader,
-        # can we move this out to a separate object at some point?
-        # I think this may also mean we're storing all the raw protein sequences
-        # once for each instantiated collator fxn.
         target_embeddings = self._get_target_embeddings(
             target_loader,
             target_order,

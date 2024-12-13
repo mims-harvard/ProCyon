@@ -36,8 +36,7 @@ class BlastRetrievalEval(AbstractRetrievalModel):
 
         scores_path = os.path.join(
             DATA_DIR,
-            "integrated_data",
-            "blast",
+            "generated_data",
             "baselines",
             "blast_scores",
             f"blastp_{blast_args}_max_ev{max_ev:d}.pkl.gz"
