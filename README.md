@@ -2,7 +2,7 @@
 ![ProCyon logo](assets/procyon_logo_large.png)
 
 ProCyon is an open-source model for predicting protein phenotypes across scales.
-This repository provides the official implementation of the model as described in our [paper](https://github.com/mims-harvard/ProCyon).
+This repository provides the official implementation of the model as described in our [overview page](https://github.com/mims-harvard/ProCyon) and our [paper](https://www.biorxiv.org/content/10.1101/2024.12.10.627665v1).
 Our associated HuggingFace collection containing model weights and datasets can be found at the following links:
 
 - Dataset: [ProCyon-Instruct](https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct)
@@ -66,3 +66,17 @@ For the core capabilities of ProCyon models, please see the provided demo notebo
 - Additional notebooks with analysis examples
 - Reproduction code from the manuscript
 - Full training documentation and tutorial
+
+## Citation
+```
+@article {Queen2024.12.10.627665,
+  author = {Queen, Owen and Huang, Yepeng and Calef, Robert and Giunchiglia, Valentina and Chen, Tianlong and Dasoulas, George and Tai, LeAnn and Ektefaie, Yasha and Noori, Ayush and Brown, Joseph and Cobley, Tom and Hrovatin, Karin and Hartvigsen, Tom and Theis, Fabian and Pentelute, Bradley L. and Khurana, Vikram and Kellis, Manolis and Zitnik, Marinka},
+  title = {ProCyon: A multimodal foundation model for protein phenotypes},
+  elocation-id = {2024.12.10.627665},
+  year = {2024},
+  doi = {10.1101/2024.12.10.627665},
+  URL = {https://www.biorxiv.org/content/early/2024/12/15/2024.12.10.627665},
+  eprint = {https://www.biorxiv.org/content/early/2024/12/15/2024.12.10.627665.full.pdf},
+  journal = {bioRxiv}
+}
+```
