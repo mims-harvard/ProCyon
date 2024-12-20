@@ -28,7 +28,9 @@ python3 -m uv pip install -e .
 # OR if omitting uv
 python3 pip install -e .
 ```
-We encourage installation within a virtual environment.
+We encourage installation within a virtual environment. Installation with
+`uv` should take less than 10 minutes, depending on the speed of your internet
+connection for downloading packages.
 
 In addition to the package code, ProCyon also requires pre-trained weights for associated
 models (e.g. Llama-3, ESM2) as well as access to the ProCyon-Instruct dataset. These dependencies
@@ -58,7 +60,9 @@ echo "HOME_DIR=\"$(pwd)\"" > .env
 ```
 
 ## Examples
-For the core capabilities of ProCyon models, please see the provided demo notebooks.
+For the core capabilities of ProCyon models, please see the provided demo
+notebooks. Both examples should run in less than 5 minutes depending on the
+speed of your GPU.
 - [Phenotype generation](https://github.com/mims-harvard/ProCyon/blob/main/examples/phenotype_generation.ipynb)
 - [Retrieval](https://github.com/mims-harvard/ProCyon/blob/main/examples/retrieval.ipynb)
 
