@@ -1,11 +1,7 @@
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "procyon"
 version = "1.0"
-requires-python = ">=3.9"
+requires-python = "==3.11.9"
 description = "A multimodal foundation model for protein phenotypes"
 readme = "README.md"
 dependencies = [
@@ -53,11 +49,11 @@ dependencies = [
    "umap-learn==0.5.5",
    "virtualenv==20.28.0",
    "wandb==0.16.3",
-   "flash-attn>=2.7.2.post1",
 ]
 
-[tool.setuptools.packages.find]
-where = ["."]
+[project.optional-dependencies]
+build = ["torch", "setuptools", "packaging"]
+compile = ["flash-attn"]
 
 [tool.uv]
 no-build-isolation-package = ["flash-attn"]

@@ -11,26 +11,36 @@ Our associated HuggingFace collection containing model weights and datasets can 
 - Binding prediction model: [ProCyon-Bind](https://huggingface.co/mims-harvard/ProCyon-Bind)
 
 ## Installation
+Requirements:
+- CUDA toolkit, particularly `nvcc`
+
 We recommend installing with [uv](https://docs.astral.sh/uv/), but install can also be done via `pip` alone. The `procyon` package used to interact with pre-trained models or train new models can be installed via
 ```
 cd /path/to/ProCyon
 
-# OPTIONAL: create virtual environment
+# RECOMMENDED: use uv to install. Two options depending on whether
+#              you want to use the default .venv virtual env that
+#              uv will create
+# OPTION 1: let uv create and manage the virtual enviroment, requires
+#           uv to already be installed
+uv sync --extra build
+uv sync --extra build --extra compile
+uv pip install -e .
+source .venv/bin/activate
+
+# OPTION 2: create virtual environment with choice of name and path
 python3 -m venv ./procyon_venv
 source ./procyon_venv/bin/activate
-
-# RECOMMENDED: use uv to install
 python3 -m pip install uv
-python3 -m uv sync --extra build
-python3 -m uv sync --extra build --extra compile
-python3 -m uv pip install -e .
+uv pip install -r pyproject.toml --extra build
+uv pip install -r pyproject.toml --extra build --extra compile
+uv pip install -e .
 
 # OR if omitting uv
 python3 pip install -e .
 ```
-We encourage installation within a virtual environment. Installation with
-`uv` should take less than 10 minutes, depending on the speed of your internet
-connection for downloading packages.
+Installation with `uv` should take less than 10 minutes, depending on the
+speed of your internet connection for downloading packages.
 
 In addition to the package code, ProCyon also requires pre-trained weights for associated
 models (e.g. Llama-3, ESM2) as well as access to the ProCyon-Instruct dataset. These dependencies
