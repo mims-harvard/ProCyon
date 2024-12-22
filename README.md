@@ -69,6 +69,8 @@ echo "DATA_DIR=\"$DATA_DIR\"" > .env
 echo "HOME_DIR=\"$(pwd)\"" > .env
 ```
 
+**Version note**: We are aware of a bug where having `transformers>4.31.0` changes generated model outputs. Please ensure your `transformers` version is set to 4.31.0 (as in environment requirements) for inference of ProCyon.
+
 ## Examples
 For the core capabilities of ProCyon models, please see the provided demo
 notebooks. Both examples should run in less than 5 minutes depending on the
