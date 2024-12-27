@@ -66,7 +66,7 @@ git clone git@hf.co:meta-llama/Llama-2-7b-hf
 # Add a `.env` file which the `procyon` package will use to find the `DATA_DIR`
 cd /path/to/ProCyon
 echo "DATA_DIR=\"$DATA_DIR\"" > .env
-echo "HOME_DIR=\"$(pwd)\"" > .env
+echo "HOME_DIR=\"$(pwd)\"" >> .env
 ```
 
 **Version note**: We are aware of a bug where having `transformers>4.31.0` changes generated model outputs. Please ensure your `transformers` version is set to 4.31.0 (as in environment requirements) for inference of ProCyon.
