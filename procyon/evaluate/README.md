@@ -7,7 +7,7 @@ configure runs.
 The evaluation framework defined here is used for running systematic performance
 evaluations of ProCyon models and other baselines across three task types (retrieval,
 question-answering, and captioning). The core tenents of the framework are that
-evaluations runs should be:
+model evaluation should be:
 - Configurable: easy to add additional models or datasets to an evaluation run, enabling smooth transition from small testing runs to systematic benchmarking runs
 - Reproducible: each run with the same config should produce the same results
 - Rigorous: models are treated as black boxes, providing each with the exact same test sets and metrics are computed identically
@@ -92,13 +92,13 @@ it_datasets:
 Each entry in the YAML file corresponds to a single dataset to evaluate on, and specifies the
 following parameters:
 - aaseq_type: what type of amino acid sequence these phenotypes are defined for. Typically `protein`, but can also be `domain`.
-- text_type: what is the source database for the phenotypes in this dataset
-- relations: some phenotype databases will have multiple types of phenotypes, e.g. Gene Ontology specifies Molecular Function, Cellular Component, and Biological Process. This parameter can be used to select a subset of relations, or the keyword `all` can be used to use all relations, or in the case when the dataset consists of a single relation type
+- text_type: what is the source database for the phenotypes in this dataset.
+- relations: some phenotype databases will have multiple types of phenotypes, e.g. Gene Ontology specifies Molecular Function, Cellular Component, and Biological Process. This parameter can be used to select a subset of relations, or the keyword `all` can be used to use all relations, or in the case when the dataset consists of a single relation type.
 - tasks: what type of tasks this dataset should be used for evaluating. Currently implemented tasks are `retrieval`, `qa`, and `caption`. Note that not all models are capable of performing all tasks, so one needs to ensure that the models specified in the model config are compatible with the set of specified tasks.
 - splits: what dataset splits to use for evaluation. Options are some number of:
   - `CL_train`: training set used for training `ProCyon-Split`
-  - `EVAL:pt_ft`: evaluation set using unseen protein-phenotype associations, but where the phenotype has been seen frequently during training
-  - `EVAL:few_shot`: evaluation set using unseen protein-phenotype associations, but where the phenotype has been seen rarely during training
+  - `EVAL:pt_ft`: evaluation set using unseen protein-phenotype associations, but where the phenotype has been seen frequently during training.
+  - `EVAL:few_shot`: evaluation set using unseen protein-phenotype associations, but where the phenotype has been seen rarely during training.
   - `EVAL:zero_shot`: evaluation set using unseen protein-phenotype associations, where the phenotype was never seen  during training. Note that not all models support prediction of zero-shot phenotypes.
 - split_method: specifies the method used for generating the dataset splits. The current version of `ProCyon-Instruct` consists only of a single splitting method per dataset.
 
@@ -108,7 +108,7 @@ These are parameters controlling things like how to compute metrics, what batch 
 inference, and where to save results. The arguments specified here are parsed directly into the
 `EvalArgs` class specified [here](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/args.py#L6).
 
-A full example can be found with the other example configs [here](https://github.com/mims-harvard/ProCyon/blob/main/examples/evaluation/eval_config.yml), but generally looks like keyword
+A full example can be found with the other example configs [here](https://github.com/mims-harvard/ProCyon/blob/main/examples/evaluation/eval_args.yml), but generally looks like keyword
 arguments specified via YAML:
 
 ```
@@ -136,3 +136,17 @@ result directory will contain one TSV per task type, giving the performance of e
 each dataset, with the exact metrics varying by task type.
 For more details on how performance metrics are computed per task, please refer to the Methods
 section of our publication.
+
+## Adding new models
+If you're interested in adding a new model to the evaluation framework, great! We're excited to
+see comparisons to additional approaches.
+
+To integrate a new model in the framework, all one needs to do is implement their approach in a way
+that abides by the abstract class definitions for [retrieval](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/retrieval.py#51), [question-answering](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/qa.py#21), or [captioning](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/caption.py#21) depending on
+what types of tasks your new model is capable of performing.
+
+The integrations can be fairly shallow wrappers of much larger models, as can be
+seen in our ProCyon wrappers defined [here](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/procyon.py).
+
+Once your classes are complete, all one needs to do is add the model classes to
+the set of available models [here](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/core.py#L68).
