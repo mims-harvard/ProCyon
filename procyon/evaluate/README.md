@@ -1,6 +1,6 @@
 # Running ProCyon evaluations
 
-TL;DR: refer to the example configuration files and run script [here](https://github.com/mims-harvard/ProCyon/blob/main/procyon/examples/evaluation/) to get started running model
+TL;DR: refer to the example configuration files and run script [here](https://github.com/mims-harvard/ProCyon/blob/main/examples/evaluation/) to get started running model
 evaluations. See below for a more thorough explanation of the evaluation framework and how to
 configure runs.
 
@@ -34,7 +34,7 @@ The available models can be seen [here](https://github.com/mims-harvard/ProCyon/
 Models are specified in a YAML file, where each entry specifies a single model
 to evaluate along with any additional model-specific configuration parameters. A
 full example model config can be seen
-[here](https://github.com/mims-harvard/ProCyon/blob/main/procyon/examples/evaluation/model_config.yml),
+[here](https://github.com/mims-harvard/ProCyon/blob/main/examples/evaluation/model_config.yml),
 but here's a short example:
 ```
 models:
@@ -63,7 +63,7 @@ The dataset config is an additional YAML file that specifies which datasets shou
 evaluation. Currently, the supported datasets are those that are available in our ProCyon-Instruct
 dataset. For more details on the structure of the dataset itself, please see the [HuggingFace dataset page](https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct) for the dataset.
 
-A full example config can be seen [here](https://github.com/mims-harvard/ProCyon/blob/main/procyon/examples/evaluation/dataset_config.yml), but here's a short example:
+A full example config can be seen [here](https://github.com/mims-harvard/ProCyon/blob/main/examples/evaluation/dataset_config.yml), but here's a short example:
 ```
 it_datasets:
   testing:
@@ -108,7 +108,7 @@ These are parameters controlling things like how to compute metrics, what batch 
 inference, and where to save results. The arguments specified here are parsed directly into the
 `EvalArgs` class specified [here](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/args.py#L6).
 
-A full example can be found with the other example configs [here](https://github.com/mims-harvard/ProCyon/blob/main/procyon/examples/evaluation/eval_config.yml), but generally looks like keyword
+A full example can be found with the other example configs [here](https://github.com/mims-harvard/ProCyon/blob/main/examples/evaluation/eval_config.yml), but generally looks like keyword
 arguments specified via YAML:
 
 ```
