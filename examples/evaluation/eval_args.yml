@@ -1,0 +1,25 @@
+# Specification of other config files and output location
+it_data_config_yml: /n/home08/rcalef/sandbox/projects/txplm/canonical_evals/test_new_repo/alldset_FULL.yml
+models_config_yml: /n/home08/rcalef/sandbox/projects/txplm/canonical_evals/test_new_repo/model_config.yml
+output_dir: /n/home08/rcalef/sandbox/projects/txplm/canonical_evals/test_new_repo/
+
+# Point to checkpoint of any ProCyon model being used to ensure consistency of data loading
+# with how the model was trained.
+model_args_from_checkpoint: /n/holystore01/LABS/mzitnik_lab/Lab/PLM/huggingface_repos/ProTeus-Split
+data_args_from_checkpoint: /n/holystore01/LABS/mzitnik_lab/Lab/PLM/huggingface_repos/ProTeus-Split
+
+# Arguments specifying how different dataset splits should be handled.
+filter_training_pairs: True
+separate_splits: True
+keep_splits_union: False
+
+# Arguments for controlling how retrieval evaluation is performed
+retrieval_eval_all_aaseqs: True
+retrieval_top_k_vals: [10, 20, 100]
+retrieval_balanced_metrics_num_samples: 5
+retrieval_balanced_metrics_neg_per_pos: 10
+retrieval_use_cached_target_embeddings: True
+
+# Additional arguments for more efficient runs.
+batch_size: 4
+use_cached_results: True

@@ -121,7 +121,7 @@ class BaseKnnModel:
                 "generated_data",
                 "baselines",
                 "blast_scores",
-                "blastp_default_max_ev10.pkl.gz"
+                "blastp_defaults_max_ev10.pkl.gz"
             )
             with gzip.open(scores_path, "rb") as fh:
                 # torch.topk treats NaNs as greater than all other values,
