@@ -142,7 +142,7 @@ If you're interested in adding a new model to the evaluation framework, great! W
 see comparisons to additional approaches.
 
 To integrate a new model in the framework, all one needs to do is implement their approach in a way
-that abides by the abstract class definitions for [retrieval](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/retrieval.py#51), [question-answering](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/qa.py#21), or [captioning](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/caption.py#21) depending on
+that abides by the abstract class definitions for [retrieval](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/retrieval.py#L51), [question-answering](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/qa.py#L21), or [captioning](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/framework/caption.py#L21) depending on
 what types of tasks your new model is capable of performing.
 
 The integrations can be fairly shallow wrappers of much larger models, as can be
