@@ -58,8 +58,10 @@ git clone git@hf.co:datasets/mims-harvard/ProCyon-Instruct
 
 # Clone model weights for associated Llama models from HuggingFace
 # Llama-3-8b for ProCyon-Full
-cd model_weights/llama-3-8b
+cd /path/to/llama3/
+# Ensure you've signed up for LLaMA-3 access
 git clone https://huggingface.co/meta-llama/Meta-Llama-3-8B
+echo "LLAMA3_PATH=/path/to/llama3/Meta-Llama-3-8B" >> .env
 
 # Llama-2-7b for ProCyon-Split
 cd ../llama-2-7b-hf
