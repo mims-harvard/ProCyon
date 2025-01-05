@@ -43,7 +43,9 @@ Installation with `uv` should take less than 10 minutes, depending on the
 speed of your internet connection for downloading packages.
 
 In addition to the package code, ProCyon also requires pre-trained weights for associated
-models (e.g. Llama-3, ESM2) as well as access to the ProCyon-Instruct dataset. These dependencies
+models (e.g. Llama-3, ESM2) as well as access to the ProCyon-Instruct dataset. 
+You'll need to request access to the LLaMA-3 model through the model page [here](https://huggingface.co/meta-llama/Meta-Llama-3-8B).
+These dependencies
 will all be stored in a single directory, which we denote `DATA_DIR`.
 
 ```
@@ -57,7 +59,7 @@ git clone git@hf.co:datasets/mims-harvard/ProCyon-Instruct
 # Clone model weights for associated Llama models from HuggingFace
 # Llama-3-8b for ProCyon-Full
 cd model_weights/llama-3-8b
-git clone git@hf.co:meta-llama/Meta-Llama-3-8B
+git clone https://huggingface.co/meta-llama/Meta-Llama-3-8B
 
 # Llama-2-7b for ProCyon-Split
 cd ../llama-2-7b-hf
