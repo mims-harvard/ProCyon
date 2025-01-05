@@ -21,11 +21,9 @@ from procyon.data.data_utils import (
     DATA_DIR,
 )
 
-from procyon.model.biogpt import BioGPTPostTokenization
 from procyon.model.contrastive import InfoNCE, InfoNCEInBatch, MaxMarginContrastiveLoss
 from procyon.model.pmc_llama import LlamaPostTokenization
 from procyon.model.esm import ESM_PLM
-from procyon.model.external.biogpt.tokenization_biogpt import BioGptTokenizer
 from procyon.model.model_utils import create_mlp, check_architecture_args, compute_conflict_matrix, left_pad_tensors
 
 from procyon.training.training_args_IT import ModelArgs, update_model_args_data_dir
@@ -115,6 +113,7 @@ class UnifiedProCyon(nn.Module):
     def __init__(self,
             config: ModelArgs,
             pretrained_weights_dir = DEFAULT_PRETRAINED_WEIGHTS_DIR,
+            for_pretraining = True,
         ):
         super(UnifiedProCyon, self).__init__()
         self.config = config
@@ -135,36 +134,7 @@ class UnifiedProCyon(nn.Module):
 
         assert self.causal_qa, 'Non-causal QA currently not working, causal_qa must be set to true'
 
-        # Text encoder definition ----------------------------------- :
-        if config.text_encoder_fname.lower().startswith('biogpt'):
-            assert config.text_encoder_fname in ['biogpt', 'BioGPT-Large'], 'BioGPT type not recognized'
-            assert not (config.is_go_tokenized or config.is_pfam_tokenized), 'Not yet supported'
-            # Tokenization is handled in the collator, so already_tokenized = True
-
-            self.text_encoder = BioGPTPostTokenization(
-                model_path = os.path.join(pretrained_weights_dir, config.text_encoder_fname),
-                use_lora=(config.freeze_text_encoder == 'lora'),
-                lora_alpha=config.text_lora_alpha,
-                lora_r=config.text_lora_r,
-                use_adapter=(config.freeze_text_encoder == 'adapter'),
-                adapter_rank=config.text_adapter_rank,
-                use_prefix=(config.freeze_text_encoder == 'prefix')
-            )
-            if config.text_encoder_debug == True:
-                self.text_encoder.model.biogpt.layers = self.text_encoder.model.biogpt.layers[: 1]
-
-            if config.freeze_text_encoder is not None:
-                self.freeze_text_encoder(text_encoder_mode=config.freeze_text_encoder)
-
-            self._init_tokenizer()
-            # Extend model tokenizer layer:
-            self.text_encoder.model.resize_token_embeddings(len(self.tokenizer) - 1)
-                # Minus one to account for EXT token, which will never be used as input
-
-            self.text_embed_dim = self.text_encoder.model.config.hidden_size
-            self.input_embeddings = self.text_encoder.model.get_input_embeddings()
-
-        elif config.text_encoder_fname.lower().startswith('llama'):
+        if config.text_encoder_fname.lower().startswith('llama'):
             if config.freeze_text_encoder == "lora":
                 config.use_lora = True
                 use_q_lora = False
@@ -184,7 +154,8 @@ class UnifiedProCyon(nn.Module):
                 max_gen_len = config.streaming_llm_max_gen_len,
                 use_q_lora=use_q_lora,
                 use_task_spc_lora=config.text_task_spc_lora,
-                lora_num = config.text_task_spc_lora_num
+                lora_num = config.text_task_spc_lora_num,
+                for_pretraining = for_pretraining,
             )
             if config.text_encoder_debug == True:
                 if config.use_lora:
@@ -196,7 +167,7 @@ class UnifiedProCyon(nn.Module):
 
             self.text_embed_dim = self.text_encoder.model.config.hidden_size
             self.input_embeddings = self.text_encoder.model.get_input_embeddings()
-            self.text_encoder.model._set_gradient_checkpointing(self.text_encoder.model.model, True)
+            #self.text_encoder.model._set_gradient_checkpointing(self.text_encoder.model.model, True)
 
             if config.freeze_text_encoder == "all":
                 for pn, p in self.text_encoder.model.named_parameters():
@@ -1115,10 +1086,7 @@ class UnifiedProCyon(nn.Module):
         return output
 
     def _init_tokenizer(self):
-        if self.config.text_encoder_fname.lower().startswith('biogpt'):
-            self.tokenizer = BioGptTokenizer.from_pretrained(os.path.join(self.pretrained_weights_dir, self.config.text_encoder_fname))
-            self.use_llama_tokenizer = False
-        elif self.config.text_encoder_fname.lower().startswith('llama'):
+        if self.config.text_encoder_fname.lower().startswith('llama'):
             if "llama-3" in self.config.text_encoder_fname.lower():
                 self.tokenizer = transformers.AutoTokenizer.from_pretrained('meta-llama/Meta-Llama-3-8B', trust_remote_code=True, cache_dir = f"{DATA_DIR}/model_weights/llama-3-8b")
                 self.tokenizer.padding_side = 'right'
@@ -1132,7 +1100,7 @@ class UnifiedProCyon(nn.Module):
             self.tokenizer.add_tokens("[CLS]")
             self.tokenizer.sep_token = '[CLS]'
             self.tokenizer.sep_token_id = self.tokenizer(self.tokenizer.sep_token, add_special_tokens=False).input_ids[0]
-        if self.tokenizer.pad_token == None:  # Fixes padding issue with LLaMA tokenizers automatically (also for BioGPT if needed)
+        if self.tokenizer.pad_token == None:  # Fixes padding issue with LLaMA tokenizers automatically
             self.tokenizer.add_tokens("[PAD]")
             self.tokenizer.pad_token = "[PAD]"
             self.tokenizer.pad_token_id = self.tokenizer(self.tokenizer.pad_token, add_special_tokens=False).input_ids[0]
@@ -1400,7 +1368,7 @@ class UnifiedProCyon(nn.Module):
 
         if model is None:
             update_model_args_data_dir(config)
-            model = UnifiedProCyon(pretrained_weights_dir = pretrained_weights_dir, config = config)
+            model = UnifiedProCyon(pretrained_weights_dir = pretrained_weights_dir, config = config, for_pretraining = False)
 
             # Check if state_dict has been consolidated locally:
             if os.path.exists(os.path.join(checkpoint_dir, state_dict_relative_path)):
@@ -1497,6 +1465,7 @@ class UnifiedProCyon(nn.Module):
 
     def freeze_text_encoder(self, text_encoder_mode: str = 'all'):
         # Note BioGPT param names have an extra 'biogpt.' prefix
+        # TODO: deprecated since BioGPT has been removed - update to work with LLaMA
 
         if text_encoder_mode != 'all':
             # freeze params in text encoder
@@ -1528,10 +1497,6 @@ class UnifiedProCyon(nn.Module):
             for name, param in self.text_encoder.named_parameters():
                 # Note: biogpt has no lm_head (no text MLM (yet))
                 param.requires_grad_(False)
-
-    def freeze_pubmedbert(self, text_encoder_mode: str = 'all'):
-        # Note BioGPT param names have an extra 'biogpt.' prefix
-        raise NotImplementedError("Freezing PubmedBERT not yet implemented")
 
 def deepspeed_init_with_checkpoint(
         train_args,

@@ -11,7 +11,6 @@ import pickle
 
 import os
 
-from procyon.model.biogpt import BioGPT
 from procyon.data.constants import ENTITY_DESCRIPTION_NAMES
 
 from dotenv import load_dotenv
@@ -105,12 +104,8 @@ def convert_batch_text(
     if not is_text_tokenized:
 
         assert text_tokenizer.text_tokenizer_name is not None
-        if text_tokenizer.text_tokenizer_name.lower().startswith("biogpt"):
-            batch_toks, batch_attn_masks, _ = BioGPT.prepare_inputs_and_tokenize(
-                text_sequences[ids].tolist(), text_tokenizer, max_text_len
-            )
 
-        elif text_tokenizer.text_tokenizer_name.lower().startswith("pubmedbert"):
+        if text_tokenizer.text_tokenizer_name.lower().startswith("pubmedbert"):
             inputs = text_tokenizer(
                 text_sequences[ids].tolist(),
                 padding=True,

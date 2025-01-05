@@ -2,8 +2,6 @@ import os, sys, logging, random, json, pickle, math
 from typing import Any, Tuple, Callable, Union, Dict, Optional, Iterable, List
 from collections.abc import Mapping
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = "3,4"
-
 import numpy as np
 import pandas as pd
 
@@ -25,14 +23,10 @@ from deepspeed import comm as dist
 
 from esm.data import Alphabet
 
-from procyon.model.model import TxPLM
 from procyon.model.model_unified import UnifiedProCyon, deepspeed_init_with_checkpoint
 from procyon.model.model_utils import detect_zero_stages
 from procyon.data.data_collator import ProteinMLMCollator
-from scripts.run_general_eval import run_general_eval
-
 from procyon.training.training_args import TrainArgs, DataArgs, ModelArgs
-from downstream.on_the_fly_eval.unsupervised.eval_retrieval import run_eval_retrieval
 
 from procyon.training.wandb_logger import WandbLogger
 from dataclasses import asdict, is_dataclass

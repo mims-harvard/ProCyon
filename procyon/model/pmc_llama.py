@@ -431,6 +431,7 @@ class LlamaPostTokenization(nn.Module):
             lora_alpha=8,
             use_task_spc_lora = False,
             lora_num = 2,
+            for_pretraining = True,
         ):
         super(LlamaPostTokenization, self).__init__()
 
@@ -475,7 +476,13 @@ class LlamaPostTokenization(nn.Module):
                 )
         else:
             if "llama-3" in model_path:
-                self.model = transformers.AutoModelForCausalLM.from_pretrained('meta-llama/Meta-Llama-3-8B', cache_dir = f"{DATA_DIR}/model_weights/llama-3-8b")
+                llama_path = os.getenv("LLAMA3_PATH")
+                if for_pretraining:
+                    self.model = transformers.AutoModelForCausalLM.from_pretrained(llama_path)
+                else:
+                    llama_config = transformers.AutoConfig.from_pretrained(llama_path)
+                    self.model = transformers.AutoModelForCausalLM.from_config(llama_config)
+                #self.model = transformers.AutoModelForCausalLM.from_pretrained('meta-llama/Meta-Llama-3-8B', cache_dir = f"{DATA_DIR}/model_weights/llama-3-8b")
             else:
                 self.model = transformers.LlamaForCausalLM.from_pretrained(model_path, config=config, quantization_config=bnb_config)
         # for pn, p in self.model.named_parameters():
