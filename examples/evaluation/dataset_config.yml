@@ -1,0 +1,44 @@
+it_datasets:
+  testing:
+    # GO:
+    - aaseq_type: protein
+      text_type: go
+      relations: [process, function, component]
+      tasks: [retrieval, qa, caption]
+      splits: [EVAL:pt_ft, EVAL:few_shot, EVAL:zero_shot]
+      split_method: sample_aware_ontology_go_centric
+    # Reactome
+    - aaseq_type: protein
+      text_type: reactome
+      relations: [all]
+      tasks: [retrieval, qa, caption]
+      splits: [EVAL:pt_ft, EVAL:few_shot, EVAL:zero_shot]
+      split_method: random_reactome_centric
+    # DrugBank:
+    - aaseq_type: protein
+      text_type: drugbank
+      relations: [drug_target, drug_enzyme, drug_carrier, drug_transporter]
+      tasks: [retrieval, qa, caption]
+      splits: [EVAL:pt_ft, EVAL:few_shot, EVAL:zero_shot]
+      split_method: atc_aware_drugbank_centric
+    # DisGeNET:
+    - aaseq_type: protein
+      text_type: disgenet
+      relations: [all]
+      tasks: [retrieval, qa, caption]
+      splits: [EVAL:few_shot, EVAL:zero_shot]
+      split_method: area_protein_aware_disgenet_centric
+    # OMIM 
+    - aaseq_type: protein
+      text_type: omim
+      relations: [all]
+      tasks: [retrieval, qa, caption]
+      splits: [EVAL:pt_ft, EVAL:few_shot, EVAL:zero_shot]
+      split_method: disgenet_aligned_improved_omim_centric
+    # EC:
+    - aaseq_type: protein
+      text_type: ec
+      relations: [all]
+      tasks: [retrieval, qa, caption]
+      splits: [EVAL:pt_ft, EVAL:few_shot, EVAL:zero_shot]
+      split_method: hierarchy_aware_ec_centric

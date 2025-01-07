@@ -1,0 +1,35 @@
+models:
+        - model_name: ProCyon
+          args:
+                  checkpoint_dir: /path/to/model_checkpoints/ProCyon-Split
+        - model_name: ProtST
+          args:
+                  max_prompt_len: 128
+        - model_name: ESM3MLP
+          args:
+                  filter_zero_shot: True
+                  num_steps: 2000
+                  num_steps_no_validation: 300
+                  validation_steps: 50
+                  hidden_dim: 256
+                  pos_weight: 1000
+                  checkpoint_dir: /path/to/model_checkpoints/trained_mlps
+        - model_name: GearNetMLP
+          args:
+                  filter_zero_shot: True
+                  num_steps: 2000
+                  num_steps_no_validation: 300
+                  validation_steps: 50
+                  hidden_dim: 256
+                  pos_weight: 1000
+                  checkpoint_dir: /path/to/model_checkpoints/trained_mlps
+        - model_name: ESM3Knn
+          args:
+                  filter_zero_shot: True
+        - model_name: GearNetKnn
+          args:
+                  filter_zero_shot: True
+        - model_name: BlastKnn
+          args:
+                  filter_zero_shot: True
+        - model_name: UniformRandom

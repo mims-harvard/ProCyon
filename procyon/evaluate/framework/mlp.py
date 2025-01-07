@@ -1,4 +1,3 @@
-import gzip
 import os
 import pickle
 from typing import (
@@ -384,6 +383,10 @@ class BaseMLPModel:
         else:
             self._train()
             print(f"saving trained model to {checkpoint_path}")
+            if not os.path.exists(self.checkpoint_dir):
+                print("specified checkpoint dir does not exist, creating it")
+                os.makedirs(self.checkpoint_dir)
+
             torch.save(self.model.state_dict(), checkpoint_path)
         self.loaded = True
 

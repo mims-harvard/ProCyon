@@ -1,4 +1,3 @@
-# TODO: Break this into split types
 SPLIT_MAPS = {
     "protein_go": {
         "pt_ft": "eval_pt_ft",
@@ -30,7 +29,7 @@ SPLIT_MAPS = {
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": None,
     },
-    "protein_protein": None, # Shouldn't get called anyways
+    "protein_protein": None,  # Shouldn't get called anyways
     "protein_omim": {
         "pt_ft": "eval_pt_ft",
         "few_shot": "eval_two_shot",

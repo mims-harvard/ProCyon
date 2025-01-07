@@ -82,6 +82,11 @@ speed of your GPU.
 - [Phenotype generation](https://github.com/mims-harvard/ProCyon/blob/main/examples/phenotype_generation.ipynb)
 - [Retrieval](https://github.com/mims-harvard/ProCyon/blob/main/examples/retrieval.ipynb)
 
+To see how to perform benchmarking runs comparing the performance of ProCyon models to
+various other baselines and models, please see the
+[example configs and scripts](https://github.com/mims-harvard/ProCyon/blob/main/examples/evaluation)
+or the [evaluation README](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/README.md).
+
 ## Coming soon!
 - Additional notebooks with analysis examples
 - Reproduction code from the manuscript

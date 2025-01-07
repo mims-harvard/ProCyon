@@ -23,6 +23,7 @@ from procyon.evaluate.framework.args import EvalArgs
 from procyon.evaluate.framework.caption import AbstractCaptionModel
 from procyon.evaluate.framework.retrieval import AbstractRetrievalModel
 
+
 class RandomCaptionEvalBase(AbstractCaptionModel):
     """Random baseline for captioning.
 
@@ -30,6 +31,7 @@ class RandomCaptionEvalBase(AbstractCaptionModel):
     baseline just randomly selects reference captions from the
     target dataset.
     """
+
     def __init__(
         self,
         model_config: Dict,
@@ -51,16 +53,19 @@ class RandomCaptionEvalBase(AbstractCaptionModel):
         data_loader: DataLoader,
     ) -> pd.DataFrame:
         if not isinstance(data_loader.dataset, AASeqTextUnifiedDataset):
-            raise ValueError(f"random model expected AASeqTextUnifiedDataset, got {type(data_loader.dataset)}")
+            raise ValueError(
+                f"random model expected AASeqTextUnifiedDataset, got {type(data_loader.dataset)}"
+            )
         aaseq_indices = []
         for model_inputs in tqdm(data_loader):
-            aaseq_indices.extend([x[-1] for x in model_inputs["reference_indices"]["input"]["seq"]])
+            aaseq_indices.extend(
+                [x[-1] for x in model_inputs["reference_indices"]["input"]["seq"]]
+            )
 
         if self.sample_from == "full_dataset":
             choices = np.arange(len(data_loader.collate_fn.text_sequences))
         else:
             choices = data_loader.dataset.all_texts
-            relation = data_loader.dataset.relation_type,
 
         if self.sample_method == "uniform":
             weights = None
@@ -79,10 +84,12 @@ class RandomCaptionEvalBase(AbstractCaptionModel):
             counts = relations.text_id.value_counts()
             if self.sample_method == "weighted":
                 if self.sample_from == "full_dataset" and len(counts) != len(choices):
-                    print(f"WARNING: random caption eval for dataset {data_loader.dataset.name()}: ",
+                    print(
+                        f"WARNING: random caption eval for dataset {data_loader.dataset.name()}: ",
                         "sampling from 'full_dataset' with weighted sampling, but "
                         "specified relations for weighting do not cover the full dataset. Falling "
-                        "back to uniform sampling")
+                        "back to uniform sampling",
+                    )
                     weights = None
                 else:
                     counts = counts[choices]
@@ -102,12 +109,17 @@ class RandomCaptionEvalBase(AbstractCaptionModel):
         )
         generated_captions = [data_loader.collate_fn.text_sequences[i] for i in indices]
         # Truncate to max len.
-        generated_captions = [" ".join(x.split()[:self.max_len]) for x in generated_captions]
+        generated_captions = [
+            " ".join(x.split()[: self.max_len]) for x in generated_captions
+        ]
 
-        return pd.DataFrame({
-            "seq_id": aaseq_indices,
-            "generated_caption": generated_captions,
-        })
+        return pd.DataFrame(
+            {
+                "seq_id": aaseq_indices,
+                "generated_caption": generated_captions,
+            }
+        )
+
 
 class UniformRandomCaptionEval(RandomCaptionEvalBase):
     def __init__(
@@ -119,6 +131,7 @@ class UniformRandomCaptionEval(RandomCaptionEvalBase):
     ):
         model_config["sample_method"] = "uniform"
         super().__init__(model_config, eval_args, model_args, device)
+
 
 class WeightedRandomCaptionEval(RandomCaptionEvalBase):
     def __init__(
@@ -132,6 +145,7 @@ class WeightedRandomCaptionEval(RandomCaptionEvalBase):
         model_config["sample_from"] = "full_dataset"
         super().__init__(model_config, eval_args, model_args, device)
 
+
 class MajorityRuleRandomCaptionEval(RandomCaptionEvalBase):
     def __init__(
         self,
@@ -144,6 +158,7 @@ class MajorityRuleRandomCaptionEval(RandomCaptionEvalBase):
         model_config["sample_from"] = "full_dataset"
         super().__init__(model_config, eval_args, model_args, device)
 
+
 class RandomRetrievalEvalBase(AbstractRetrievalModel):
     """Random baseline for captioning.
 
@@ -151,6 +166,7 @@ class RandomRetrievalEvalBase(AbstractRetrievalModel):
     baseline just randomly selects reference captions from the
     target dataset.
     """
+
     def __init__(
         self,
         model_config: Dict,
@@ -188,7 +204,9 @@ class RandomRetrievalEvalBase(AbstractRetrievalModel):
                 query_loader.dataset.relation_type,
             )
         else:
-            raise ValueError(f"random retrieval model got unexpected query dataset type: {type(query_loader.dataset)}")
+            raise ValueError(
+                f"random retrieval model got unexpected query dataset type: {type(query_loader.dataset)}"
+            )
 
         # Subset to just the train set for generating predictions.
         relations = relations.query("split == 'CL_train'")
@@ -202,10 +220,12 @@ class RandomRetrievalEvalBase(AbstractRetrievalModel):
 
             counts = relations.seq_id.value_counts()
             if self.sample_from == "all_targets" and len(counts) != len(target_order):
-                print(f"WARNING: random retrieval eval for dataset {query_loader.dataset.name()}: ",
+                print(
+                    f"WARNING: random retrieval eval for dataset {query_loader.dataset.name()}: ",
                     "sampling from 'full_dataset' with weighted sampling, but "
                     "specified relations for weighting do not cover the full dataset. Falling "
-                    "back to uniform sampling")
+                    "back to uniform sampling",
+                )
                 choices = target_order
                 weights = None
             elif self.sample_method == "weighted":
@@ -217,7 +237,7 @@ class RandomRetrievalEvalBase(AbstractRetrievalModel):
                 weights = counts / counts.sum()
                 sampled_order = weights.sort_values(ascending=False).index.tolist()
 
-        values = torch.linspace(start=1, end=0, steps=len(choices)+1)[:-1]
+        values = torch.linspace(start=1, end=0, steps=len(choices) + 1)[:-1]
         ret = torch.zeros(len(query_order), len(target_order))
         for query_idx in range(len(query_order)):
             if self.sample_method == "uniform":
@@ -237,6 +257,7 @@ class RandomRetrievalEvalBase(AbstractRetrievalModel):
             ret[query_idx, sampled_order] = values
         return ret
 
+
 class UniformRandomRetrievalEval(RandomRetrievalEvalBase):
     def __init__(
         self,
@@ -247,6 +268,7 @@ class UniformRandomRetrievalEval(RandomRetrievalEvalBase):
     ):
         model_config["sample_method"] = "uniform"
         super().__init__(model_config, eval_args, model_args, device)
+
 
 class WeightedRandomRetrievalEval(RandomRetrievalEvalBase):
     def __init__(
@@ -259,6 +281,7 @@ class WeightedRandomRetrievalEval(RandomRetrievalEvalBase):
         model_config["sample_method"] = "weighted"
         model_config["sample_from"] = "full_dataset"
         super().__init__(model_config, eval_args, model_args, device)
+
 
 class MajorityRuleRandomRetrievalEval(RandomRetrievalEvalBase):
     def __init__(

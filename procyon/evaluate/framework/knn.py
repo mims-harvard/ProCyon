@@ -39,6 +39,7 @@ embedding_map = {
     "gearnet": "gearnet.pt",
 }
 
+
 class BaseKnnModel:
     def __init__(
         self,
@@ -49,7 +50,14 @@ class BaseKnnModel:
     ):
         self.train_splits = model_config.get("train_splits", ["CL_train"])
         self.embed_type = model_config["embed_type"]
-        assert self.embed_type in ["esm2", "esm2-650m", "esm2-3b", "esm3", "gearnet", "blast"]
+        assert self.embed_type in [
+            "esm2",
+            "esm2-650m",
+            "esm2-3b",
+            "esm3",
+            "gearnet",
+            "blast",
+        ]
         if self.embed_type == "esm2":
             self.embed_type = "esm2-3b"
         # For PPI queries, whether or not to disallow a protein
@@ -110,17 +118,17 @@ class BaseKnnModel:
         if self.embed_type == "blast":
             scores_path = os.path.join(
                 DATA_DIR,
-                "integrated_data",
-                "blast",
+                "generated_data",
                 "baselines",
                 "blast_scores",
-                self.aaseq_type,
                 "blastp_defaults_max_ev10.pkl.gz"
             )
             with gzip.open(scores_path, "rb") as fh:
                 # torch.topk treats NaNs as greater than all other values,
                 # so want to set to -1 so we can still get the highest EV hits.
-                self.scores = torch.nan_to_num(torch.tensor(pd.read_pickle(fh).values), nan=-1)
+                self.scores = torch.nan_to_num(
+                    torch.tensor(pd.read_pickle(fh).values), nan=-1
+                )
             self.scores = self.scores[:, self.aaseq_id_order]
         else:
             aaseq_info_path = os.path.join(
@@ -148,7 +156,9 @@ class BaseKnnModel:
             self.embeds = F.normalize(torch.load(embeds_path))
             with open(id_map_path, "rb") as fh:
                 id_order_map = {x.split()[0]: i for i, x in enumerate(pickle.load(fh))}
-            expected_aaseq_order = pd.read_pickle(aaseq_info_path)[f"{self.aaseq_type}_id"].tolist()
+            expected_aaseq_order = pd.read_pickle(aaseq_info_path)[
+                f"{self.aaseq_type}_id"
+            ].tolist()
             reorder_idxs = [id_order_map[x] for x in expected_aaseq_order]
             self.embeds = self.embeds[reorder_idxs]
 
@@ -222,32 +232,46 @@ class KnnQAEval(BaseKnnModel):
                 ground_truth_filt.append(ground_truth[i])
             else:
                 if not self.filter_zero_shot:
-                    raise ValueError(f"KnnQAEval: test set contained text ID not observed in train set: {text_id}")
+                    raise ValueError(
+                        f"KnnQAEval: test set contained text ID not observed in train set: {text_id}"
+                    )
                 # else do nothing, i.e. skip this pair
         print(
             f"KnnQaEval: filtered {len(ground_truth) - len(ground_truth_filt)} / {len(ground_truth)} "
             "due to absence from train set."
         )
-        preds = np.array([inferred_labels[i][mapped_text_idx] for i, (mapped_text_idx) in enumerate(mapped_text_idxs)])
+        preds = np.array(
+            [
+                inferred_labels[i][mapped_text_idx]
+                for i, (mapped_text_idx) in enumerate(mapped_text_idxs)
+            ]
+        )
         ground_truth = np.array(ground_truth_filt)
 
         best_thresh, best_acc = optimal_qa_thresh_acc(preds, ground_truth)
-        print(f"KnnQAEval: best thresh of {best_thresh:0.3f} gives acc of {best_acc:0.3f}")
+        print(
+            f"KnnQAEval: best thresh of {best_thresh:0.3f} gives acc of {best_acc:0.3f}"
+        )
 
-        results_dict["pred"] = torch.tensor(np.where(preds >= best_thresh, self.yes_token, self.no_token))
-        results_dict["y"] = torch.tensor(np.where(ground_truth == "yes", self.yes_token, self.no_token))
+        results_dict["pred"] = torch.tensor(
+            np.where(preds >= best_thresh, self.yes_token, self.no_token)
+        )
+        results_dict["y"] = torch.tensor(
+            np.where(ground_truth == "yes", self.yes_token, self.no_token)
+        )
         return results_dict
 
     def get_predictions(
         self,
         data_loader: DataLoader,
-        aaseq_type: str = 'protein',
+        aaseq_type: str = "protein",
     ) -> Dict[str, torch.Tensor]:
         if not isinstance(data_loader.dataset, AASeqTextUnifiedDataset):
-           raise ValueError(f"unexpected dataset type: {type(data_loader.dataset)}")
+            raise ValueError(f"unexpected dataset type: {type(data_loader.dataset)}")
 
         self.load_data(data_loader.dataset)
         return self.calc_results(data_loader)
+
 
 class KnnRetrievalEval(BaseKnnModel):
     def __init__(
@@ -257,7 +281,9 @@ class KnnRetrievalEval(BaseKnnModel):
         model_args: ModelArgs,
         device: torch.device,
     ):
-        super(KnnRetrievalEval, self).__init__(model_config, eval_args, model_args, device)
+        super(KnnRetrievalEval, self).__init__(
+            model_config, eval_args, model_args, device
+        )
 
     def get_predictions(
         self,
@@ -271,7 +297,7 @@ class KnnRetrievalEval(BaseKnnModel):
         elif isinstance(query_loader.dataset, AASeqDataset):
             input_key = "seq"
         else:
-           raise ValueError(f"unexpected dataset type: {type(query_loader.dataset)}")
+            raise ValueError(f"unexpected dataset type: {type(query_loader.dataset)}")
 
         self.load_data(query_loader.dataset)
 
@@ -303,15 +329,20 @@ class KnnRetrievalEval(BaseKnnModel):
                 text_order.append(self.text_id_to_idx[query_id])
             else:
                 if not self.filter_zero_shot:
-                    raise ValueError(f"KnnRetrievalEval: test set contained query ID not observed in train set: {query_id}")
+                    raise ValueError(
+                        f"KnnRetrievalEval: test set contained query ID not observed in train set: {query_id}"
+                    )
                 # Else we need to put in a placeholder row, and mark this row for filling with NaNs
                 text_order.append(0)
                 nan_rows.append(i)
-        print(f"KnnRetrievalEval: filtered {len(nan_rows)} / {len(query_order)} queries due to absence from train set")
+        print(
+            f"KnnRetrievalEval: filtered {len(nan_rows)} / {len(query_order)} queries due to absence from train set"
+        )
         ret = inferred_labels[text_order][:, aaseq_order]
         ret[nan_rows] = np.nan
 
         return ret
+
 
 class ESMKnnQAEval(KnnQAEval):
     def __init__(
@@ -324,6 +355,7 @@ class ESMKnnQAEval(KnnQAEval):
         model_config["embed_type"] = "esm2"
         super(ESMKnnQAEval, self).__init__(model_config, eval_args, model_args, device)
 
+
 class ESM3KnnQAEval(KnnQAEval):
     def __init__(
         self,
@@ -335,6 +367,7 @@ class ESM3KnnQAEval(KnnQAEval):
         model_config["embed_type"] = "esm3"
         super(ESM3KnnQAEval, self).__init__(model_config, eval_args, model_args, device)
 
+
 class GearNetKnnQAEval(KnnQAEval):
     def __init__(
         self,
@@ -344,7 +377,10 @@ class GearNetKnnQAEval(KnnQAEval):
         device: torch.device,
     ):
         model_config["embed_type"] = "gearnet"
-        super(GearNetKnnQAEval, self).__init__(model_config, eval_args, model_args, device)
+        super(GearNetKnnQAEval, self).__init__(
+            model_config, eval_args, model_args, device
+        )
+
 
 class BlastKnnQAEval(KnnQAEval):
     def __init__(
@@ -355,7 +391,10 @@ class BlastKnnQAEval(KnnQAEval):
         device: torch.device,
     ):
         model_config["embed_type"] = "blast"
-        super(BlastKnnQAEval, self).__init__(model_config, eval_args, model_args, device)
+        super(BlastKnnQAEval, self).__init__(
+            model_config, eval_args, model_args, device
+        )
+
 
 class ESMKnnRetrievalEval(KnnRetrievalEval):
     def __init__(
@@ -366,7 +405,10 @@ class ESMKnnRetrievalEval(KnnRetrievalEval):
         device: torch.device,
     ):
         model_config["embed_type"] = "esm2"
-        super(ESMKnnRetrievalEval, self).__init__(model_config, eval_args, model_args, device)
+        super(ESMKnnRetrievalEval, self).__init__(
+            model_config, eval_args, model_args, device
+        )
+
 
 class ESM3KnnRetrievalEval(KnnRetrievalEval):
     def __init__(
@@ -377,7 +419,10 @@ class ESM3KnnRetrievalEval(KnnRetrievalEval):
         device: torch.device,
     ):
         model_config["embed_type"] = "esm3"
-        super(ESM3KnnRetrievalEval, self).__init__(model_config, eval_args, model_args, device)
+        super(ESM3KnnRetrievalEval, self).__init__(
+            model_config, eval_args, model_args, device
+        )
+
 
 class GearNetKnnRetrievalEval(KnnRetrievalEval):
     def __init__(
@@ -388,7 +433,10 @@ class GearNetKnnRetrievalEval(KnnRetrievalEval):
         device: torch.device,
     ):
         model_config["embed_type"] = "gearnet"
-        super(GearNetKnnRetrievalEval, self).__init__(model_config, eval_args, model_args, device)
+        super(GearNetKnnRetrievalEval, self).__init__(
+            model_config, eval_args, model_args, device
+        )
+
 
 class BlastKnnRetrievalEval(KnnRetrievalEval):
     def __init__(
@@ -399,4 +447,6 @@ class BlastKnnRetrievalEval(KnnRetrievalEval):
         device: torch.device,
     ):
         model_config["embed_type"] = "blast"
-        super(BlastKnnRetrievalEval, self).__init__(model_config, eval_args, model_args, device)
+        super(BlastKnnRetrievalEval, self).__init__(
+            model_config, eval_args, model_args, device
+        )

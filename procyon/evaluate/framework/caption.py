@@ -17,6 +17,7 @@ from procyon.training.training_args_IT import ModelArgs
 from torch.utils.data import DataLoader
 from transformers import PreTrainedTokenizer
 
+
 class AbstractCaptionModel:
     def __init__(
         self,
@@ -33,6 +34,7 @@ class AbstractCaptionModel:
     ) -> pd.DataFrame:
         raise Exception("not implemented")
 
+
 def truncate_for_bertscore(
     strs: List[str],
     tokenizer: PreTrainedTokenizer,
@@ -41,6 +43,7 @@ def truncate_for_bertscore(
     """Round-trip through tokenizer to truncate."""
     tokenized = tokenizer(strs, max_length=max_len, truncation=True)
     return tokenizer.batch_decode(tokenized["input_ids"], skip_special_tokens=True)
+
 
 def merge_reference_captions(
     preds: pd.DataFrame,
@@ -53,11 +56,14 @@ def merge_reference_captions(
 
     collator = data_loader.collate_fn
     if collator.use_entity_compositions:
-        reference_captions = collator._sample_batch_entity_descriptions(merged.text_id.to_list())
+        reference_captions = collator._sample_batch_entity_descriptions(
+            merged.text_id.to_list()
+        )
     else:
         reference_captions = collator.text_sequences[merged.text_id.to_list()].tolist()
 
     return merged.assign(reference_caption=reference_captions)
+
 
 def calculate_bertscores(
     preds_w_refs: pd.DataFrame,
@@ -94,6 +100,7 @@ def calculate_bertscores(
 
     return preds_w_refs
 
+
 def calculate_rouge(
     preds_w_refs: pd.DataFrame,
 ) -> pd.DataFrame:
@@ -110,6 +117,7 @@ def calculate_rouge(
         preds_w_refs[metric_name] = results[metric_name]
     return preds_w_refs
 
+
 def calculate_bleu(
     preds_w_refs: pd.DataFrame,
 ) -> pd.DataFrame:
@@ -117,14 +125,17 @@ def calculate_bleu(
 
     # Have to compute one-by-one to get metrics per individual pair.
     bleu_scores = defaultdict(list)
-    for gen, ref in preds_w_refs[["generated_caption", "reference_caption"]].itertuples(index=False):
+    for gen, ref in preds_w_refs[["generated_caption", "reference_caption"]].itertuples(
+        index=False
+    ):
         scores = scorer.compute(predictions=[gen], references=[ref])
         for i, val in enumerate(scores["precisions"]):
-            bleu_scores[f"bleu{i+1}"].append(val/100)
+            bleu_scores[f"bleu{i+1}"].append(val / 100)
 
     for metric_name, metric_vals in bleu_scores.items():
         preds_w_refs[metric_name] = metric_vals
     return preds_w_refs
+
 
 def summarize_metrics(
     grouped_df: pd.core.groupby.generic.DataFrameGroupBy,
@@ -138,6 +149,7 @@ def summarize_metrics(
         all_cols["count"] = int(summary["count"])
     return pd.Series(all_cols)
 
+
 def calc_caption_metrics(
     preds: pd.DataFrame,
     data_loader: DataLoader,
@@ -145,10 +157,12 @@ def calc_caption_metrics(
 ) -> Dict:
     # Get and write dataframe with each generated caption shown alongside reference captions that
     # relate to the given aaseq.
-    preds_w_ref = (merge_reference_captions(preds, data_loader)
-                   .pipe(calculate_bertscores)
-                   .pipe(calculate_rouge)
-                   .pipe(calculate_bleu))
+    preds_w_ref = (
+        merge_reference_captions(preds, data_loader)
+        .pipe(calculate_bertscores)
+        .pipe(calculate_rouge)
+        .pipe(calculate_bleu)
+    )
     with gzip.open(os.path.join(output_dir, "full_captions.tsv.gz"), "w") as fh:
         preds_w_ref.to_csv(fh, sep="\t", index=False)
 
@@ -158,23 +172,28 @@ def calc_caption_metrics(
     # that only captures/matches one reference caption (e.g. for Drugbank drug-carrier relations,
     # the protein may be a carrier for multiple drugs, and the model outputs a caption for just one
     # of those drugs).
-    non_metric_cols =  ["seq_id", "text_id", "reference_caption", "generated_caption", "count"]
+    non_metric_cols = [
+        "seq_id",
+        "text_id",
+        "reference_caption",
+        "generated_caption",
+        "count",
+    ]
     metric_names = [x for x in preds_w_ref.columns if x not in non_metric_cols]
-    summarized_scores = (preds_w_ref
-                         .groupby("seq_id")
-                         .apply(lambda x: summarize_metrics(x, metric_names))
-                         .astype({"count": int})
-                         .reset_index())
-    with gzip.open(os.path.join(output_dir, "caption_scores_per_seq.tsv.gz"), "w") as fh:
+    summarized_scores = (
+        preds_w_ref.groupby("seq_id")
+        .apply(lambda x: summarize_metrics(x, metric_names))
+        .astype({"count": int})
+        .reset_index()
+    )
+    with gzip.open(
+        os.path.join(output_dir, "caption_scores_per_seq.tsv.gz"), "w"
+    ) as fh:
         summarized_scores.to_csv(fh, sep="\t", index=False)
 
     # Metrics averaged over all aaseqs. Note that this is not weighted, i.e. aaseqs with many
     # relations are treated the same as those with few.
-    metrics = (summarized_scores
-               .drop(columns=["count"])
-               .describe()
-               .loc["mean"]
-               .to_dict())
+    metrics = summarized_scores.drop(columns=["count"]).describe().loc["mean"].to_dict()
     return metrics
 
 
@@ -187,7 +206,9 @@ def run_caption_eval(
     dataset_key: str,
     output_dir: str,
 ) -> Dict:
-    print(f"caption: evaluating model {model_name} on dataset {dataset_key} , num_aaseqs={len(data_loader.dataset)}")
+    print(
+        f"caption: evaluating model {model_name} on dataset {dataset_key} , num_aaseqs={len(data_loader.dataset)}"
+    )
     preds = model.get_predictions(data_loader)
 
     metrics = calc_caption_metrics(preds, data_loader, output_dir)

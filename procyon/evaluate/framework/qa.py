@@ -1,10 +1,7 @@
 import os
 import pickle
 
-from typing import (
-    Dict,
-    Tuple,
-)
+from typing import Dict
 
 import torch
 
@@ -17,8 +14,9 @@ from procyon.evaluate.framework.utils import calc_bootstrap_bounds
 from procyon.training.training_args_IT import ModelArgs
 from procyon.training.train_utils import (
     decompose_dataset_name,
-    get_qa_metrics_from_preds
+    get_qa_metrics_from_preds,
 )
+
 
 class AbstractQAModel:
     def __init__(
@@ -30,11 +28,13 @@ class AbstractQAModel:
     ):
         return self
 
-    def get_predictions(self,
+    def get_predictions(
+        self,
         data_loader: DataLoader,
-        aaseq_type: str = 'protein',
+        aaseq_type: str = "protein",
     ) -> Dict[str, torch.Tensor]:
         pass
+
 
 def calc_qa_metrics(
     pred_tokens: torch.Tensor,
@@ -56,16 +56,20 @@ def calc_qa_metrics(
     acc_dict.update(calc_bootstrap_bounds({"acc": correct}))
 
     f1_dict = {"f1": f1}
-    def f1_func(preds, y_toks) -> float:
-        return f1_score(y_toks, preds, average='macro')
 
-    f1_dict.update(calc_bootstrap_bounds(
-        {"f1": list(zip(pred_tokens.tolist(), y_tokens.tolist()))},
-        statistic=f1_func,
-        paired=True,
-    ))
+    def f1_func(preds, y_toks) -> float:
+        return f1_score(y_toks, preds, average="macro")
+
+    f1_dict.update(
+        calc_bootstrap_bounds(
+            {"f1": list(zip(pred_tokens.tolist(), y_tokens.tolist()))},
+            statistic=f1_func,
+            paired=True,
+        )
+    )
     acc_dict.update(f1_dict)
     return acc_dict
+
 
 def run_qa_eval(
     model: AbstractQAModel,
@@ -76,7 +80,9 @@ def run_qa_eval(
     dataset_key: str,
     output_dir: str,
 ) -> Dict:
-    print(f"QA: evaluating model {model_name} on dataset {dataset_key} , num_qs={len(data_loader.dataset)}")
+    print(
+        f"QA: evaluating model {model_name} on dataset {dataset_key} , num_qs={len(data_loader.dataset)}"
+    )
     aaseq_type, _, _ = decompose_dataset_name(dataset_key)
 
     preds_path = os.path.join(output_dir, "results_dict.pkl")
@@ -104,5 +110,3 @@ def run_qa_eval(
     print("f1: {:.4f}".format(metrics["f1"]))
 
     return metrics
-
-    # Average for all scores:
