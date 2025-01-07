@@ -49,6 +49,7 @@ dependencies = [
    "umap-learn==0.5.5",
    "virtualenv==20.28.0",
    "wandb==0.16.3",
+   "bert-score>=0.3.13",
 ]
 
 [project.optional-dependencies]
