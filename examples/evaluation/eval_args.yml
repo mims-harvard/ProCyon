@@ -1,12 +1,12 @@
 # Specification of other config files and output location
-it_data_config_yml: /n/home08/rcalef/sandbox/projects/txplm/canonical_evals/test_new_repo/alldset_FULL.yml
-models_config_yml: /n/home08/rcalef/sandbox/projects/txplm/canonical_evals/test_new_repo/model_config.yml
-output_dir: /n/home08/rcalef/sandbox/projects/txplm/canonical_evals/test_new_repo/
+it_data_config_yml: /path/to/ProCyon/examples/evaluation/dataset_config.yml
+models_config_yml: /path/to/ProCyon/examples/evaluation/model_config.yml
+output_dir: /path/to/output
 
 # Point to checkpoint of any ProCyon model being used to ensure consistency of data loading
 # with how the model was trained.
-model_args_from_checkpoint: /n/holystore01/LABS/mzitnik_lab/Lab/PLM/huggingface_repos/ProTeus-Split
-data_args_from_checkpoint: /n/holystore01/LABS/mzitnik_lab/Lab/PLM/huggingface_repos/ProTeus-Split
+model_args_from_checkpoint: /path/to/model_checkpoints/ProCyon-Split
+data_args_from_checkpoint: /path/to/model_checkpoints/ProCyon-Split
 
 # Arguments specifying how different dataset splits should be handled.
 filter_training_pairs: True
