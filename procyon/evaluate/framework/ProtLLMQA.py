@@ -62,7 +62,6 @@ from procyon.evaluate.framework.retrieval import (
     get_retrieval_target_set,
 )
 from procyon.evaluate.framework.qa import AbstractQAModel
-from procyon.evaluate.general_eval import prepare_inputs
 
 from procyon.training.training_args_IT import ModelArgs
 from procyon.model.protllm import ProtLlmForBinaryCls, Trainer4ProtLlm
@@ -618,7 +617,7 @@ class ProtLLMQAEval(AbstractQAModel):
             batch.update({"return_dict": True})
 
             # Move all elements of dictionary to device
-            batch = prepare_inputs(batch)
+            batch = move_inputs_to_device(batch)
 
             # Model fwd pass:
             pred_logits = self.model.model(**batch).logits.detach().cpu()
