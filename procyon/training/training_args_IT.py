@@ -290,7 +290,7 @@ class ModelArgs:
 
     ######################## Shallow embeddings ########################
     use_text_embeddings: bool = field(
-        default = True,
+        default = False,
         metadata = {
             "help": "If true, uses GO embeddings by retrieving from path specified in model_args.",
         }
@@ -661,112 +661,6 @@ class DataArgs:
                     "regarding which datasets to use.",
         },
     )
-    # datasets included:
-    # TODO: Could split this up into training and evaluation inclusion
-    use_protein_go_dataset: bool = field(
-        default = True,
-        metadata = {
-            'help': 'If True, use GO dataset to train the model.'
-        }
-    )
-
-    use_domain_go_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use Domain-GO dataset to train the model.'
-        }
-    )
-
-    use_pfam_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use Pfam dataset to train the model.'
-        }
-    )
-
-    use_omim_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use OMIM dataset to train the model.'
-        }
-    )
-
-    use_disgenet_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use DisGeNet dataset to train the model.'
-        }
-    )
-
-    use_ec_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use EC dataset to train the model.'
-        }
-    )
-
-    use_opentargets_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use OpenTargets dataset to train the model.'
-        }
-    )
-
-    use_huri_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use HuRI dataset to train the model.'
-        }
-    )
-
-    use_string_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use STRING dataset to train the model.'
-        }
-    )
-
-    use_clingen_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use ClinGen dataset to train the model.'
-        }
-    )
-
-    use_pharmgkb_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use PharmGKB dataset to train the model.'
-        }
-    )
-
-    use_ctb_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use CTB dataset to train the model.'
-        }
-    )
-
-    use_reactome_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use Reactome dataset to train the model.'
-        }
-    )
-
-    use_drugbank_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use Drugbank dataset to train the model.'
-        }
-    )
-
-    use_mouse_dataset: bool = field(
-        default = False,
-        metadata = {
-            'help': 'If True, use Mouse dataset to train the model.'
-        }
-    )
 
     # ablations
     use_protein_mlm: bool = field(
@@ -843,13 +737,6 @@ class DataArgs:
             "help":"Negative sampling strategy for protein-go CL."
         }
     )
-    # negative_sampling_strategy_retrieval: str = field(
-    #     default="protein_both",
-    #     metadata={
-    #         "choices":["go_only", "protein_go_both", "protein_only", "in_batch"],
-    #         "help":"Negative sampling strategy for protein-protein CL."
-    #     }
-    # )
 
     use_only_goa_gos: bool = field(
         default=True,
@@ -914,24 +801,6 @@ class DataArgs:
         }
     )
 
-    # num_neg_samples_protein_go_per_go: int = field(
-    #     default=64,
-    #     metadata={
-    #         "help":"Number of negative samples per GO end for protein-GO CL."
-    #     }
-    # )
-    # num_neg_samples_protein_go_per_protein: int = field(
-    #     default=2,
-    #     metadata={
-    #         "help":"Number of negative samples per protein for protein-GO CL."
-    #     }
-    # )
-    # num_neg_samples_protein_protein_per_protein: int = field(
-    #     default=2,
-    #     metadata={
-    #         "help":"Number of negative samples per protein for protein-protein CL."
-    #     }
-    # )
     num_neg_samples_qa: int = field(
         default = 1,
         metadata = {
@@ -1026,28 +895,11 @@ class DataArgs:
         },
     )
 
-
-    #Relation extraction
-    relation_file: str = field(
-        default = os.path.join(DATA_DIR, "integrated_data/relation2id_model_input.csv"),
-        metadata = {
-            "help":"File containing relational information, including symmetry requirements and number of relations.",
-        }
-    )
-
     val_split_type: str = field(
         default = 'pt_ft',
         metadata = {
             'help': 'Type of split to use for validation. Temporary until we combine validation dataframes.',
             'choices': ['pt_ft', 'five_shot', 'zero_shot']
-        }
-    )
-
-    # Ablations:
-    use_old_data: bool = field(
-        default = False,
-        metadata = {
-            "help": "If True, use the old data used by Tom for his thesis work"
         }
     )
 
