@@ -62,7 +62,6 @@ from procyon.evaluate.framework.retrieval import (
     get_retrieval_target_set,
 )
 from procyon.evaluate.framework.qa import AbstractQAModel
-from procyon.evaluate.general_eval import prepare_inputs
 
 from procyon.training.training_args_IT import ModelArgs
 from procyon.model.protllm import ProtLlmForBinaryCls, Trainer4ProtLlm
@@ -554,6 +553,7 @@ class ProtLLMQAEval(AbstractQAModel):
 
         self.PROTEIN_SEQS = [str(seq.seq) for seq in SeqIO.parse(os.path.join(DATA_DIR, f"integrated_data/v1/protein/protein_sequences.fa"), "fasta")]
         self.DOMAIN_SEQS = [str(seq.seq) for seq in SeqIO.parse(os.path.join(DATA_DIR, f"integrated_data/v1/domain/domain_sequences.fa"), "fasta")]
+        self.device = device
 
     @torch.no_grad()
     def get_predictions(
@@ -618,7 +618,7 @@ class ProtLLMQAEval(AbstractQAModel):
             batch.update({"return_dict": True})
 
             # Move all elements of dictionary to device
-            batch = prepare_inputs(batch)
+            batch = move_inputs_to_device(batch, device)
 
             # Model fwd pass:
             pred_logits = self.model.model(**batch).logits.detach().cpu()

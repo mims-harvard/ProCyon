@@ -43,7 +43,6 @@ def sum_dicts(lhs: Dict, rhs: Dict):
     for k, v in rhs.items():
         lhs[k] += v
 
-
 def move_inputs_to_device(
     data: Union[torch.Tensor, Any],
     device: torch.device,
