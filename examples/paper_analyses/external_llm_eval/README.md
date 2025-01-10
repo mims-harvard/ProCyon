@@ -1,10 +1,14 @@
 # External LLM evaluation
-This directory contains the scripts necessary to recreate our experiments comparing ProCyon model phenotype generation
-to vanilla LLMs. These results are largely those presented in Figures 4C and 4D in our manuscript. Note that
-automated reference-based metrics, as shown in the lower facet of Figure 4B, can be generated for ProCyon models using
-the evaluation framework described [here](https://github.com/mims-harvard/ProCyon/tree/main/procyon/evaluate).
+This directory contains the scripts necessary to recreate our experiments comparing ProCyon phenotype generation
+to vanilla LLMs. These results are largely those presented in Figures 4B, C, D in our manuscript. These results can be
+broadly divided into two categories:
+- [LLM-based ranking](https://github.com/mims-harvard/ProCyon/tree/main/examples/paper_analyses/external_llm_eval#llm-as-a-judge), referred to as an [LLM-as-a-Judge approach](https://arxiv.org/abs/2306.05685)
+- [Reference-based metrics](https://github.com/mims-harvard/ProCyon/tree/main/examples/paper_analyses/external_llm_eval#reference-based-metrics) calculated directly against reference phenotypes (e.g. BERTScore, ROUGE, BLEU)
 
-Our workflow for comparing to external LLMs is based on an [LLM-as-a-Judge approach](https://arxiv.org/abs/2306.05685) which
+The steps to reproduce both comparison methods are described below.
+
+## LLM-as-a-Judge
+Our LLM-as-a-Judge workflow
 aims to approximate the nuances of human evaluation while being more scalable due to using an LLM to rank outputs instead of
 a human. Our approach is based on pairwise comparisons: the LLM judge is presented with two phenotype texts and is asked to
 select which better captures a provided set of reference annotations, or to output a tie if both seem equally good or bad.
@@ -19,15 +23,15 @@ The overall workflow consists of the following steps:
 
 We provide scripts and notebooks for each step of this process.
 
-## Protein subset selection
+### Protein subset selection
 To ensure that our evaluation subset captures proteins with varying levels of annotation, i.e. includes both well-studied and
 under-studied proteins, we perform subsampling stratified by [UniProt annotation scores](https://www.uniprot.org/help/annotation_score).
 
 The notebook used for our subsampling is `select_llm_samples.ipynb`, and should recreate the exact subset of proteins used for
 our analyses, but the precomputed protein subsets as well as the UniProt annotation scores used can also be found in the
-[ProCyon-Instruct dataset](https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct/tree/main/experimental_data/llm_judge_eval/selected_caption_samples).
+[ProCyon-Instruct dataset](https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct/tree/main/experimental_data/external_llm_eval/selected_caption_samples).
 
-## Generate ProCyon phenotype descriptions
+### Generate ProCyon phenotype descriptions
 Generating phenotype descriptions from a ProCyon model can be accomplished using the evaluation framework. If using a protein subset as
 described above, the dataset config should be modified to specify the desired subset as a TSV file. For example:
 ```
@@ -58,7 +62,7 @@ where `/path/to/reactome_subset.tsv` follows the TSV format output by `select_ll
 
 After running the evaluation run, the generated phenotypes per dataset will be contained in `{eval_output_dir}/caption/ProCyon/{dataset_name}/full_captions.tsv.gz`.
 
-## Generate external LLM phenotype descriptions
+### Generate external LLM phenotype descriptions
 The exact workflow for generating phenotype descriptions with an external LLM will vary depending on the external LLM used, so we only provide
 a script for generating prompts that match those used for ProCyon models, which can then be used to query your LLM of choice.
 
@@ -68,7 +72,7 @@ tasks in the corresponding dataset entry. If generating a QA prompt, the output 
 
 The script can be run as follows:
 ```
-/path/to/ProCyon/examples/paper_analyses/llm_judge_phenotype_eval/generate_llm_prompts.py \
+/path/to/ProCyon/examples/paper_analyses/external_llm_eval/generate_llm_prompts.py \
   --it_data_config_yml dataset_config.yml \
   --encoding aaseq
 ```
@@ -80,7 +84,7 @@ with output written to the current directory. The `--encoding` argument specifie
 
 Given the resulting CSV of prompts, one can then prompt the desired LLM using your workflow of choice.
 
-## Generate LLM-as-a-Judge prompts
+### Generate LLM-as-a-Judge prompts
 Given phenotype descriptions from a ProCyon model and an external LLM, we can then generate the prompts for the LLM judge to rank the phenotype
 descriptions. For each protein, we generate prompt that consists of a preamble, the reference phenotype annotations for that protein and the
 corresponding knowledge domain, and the two phenotype descriptions. The judge is then asked to output either a single winner or a tie.
@@ -91,7 +95,7 @@ ranking across the two permutations.
 
 We generate the judge prompts using the `generate_judge_prompts.py` script as follows:
 ```
-/path/to/ProCyon/examples/paper_analyses/llm_judge_phenotype_eval/generate_judge_prompts.py \
+/path/to/ProCyon/examples/paper_analyses/external_llm_eval/generate_judge_prompts.py \
   --procyon_phenotypes_path  /path/to/procyon_eval/caption/ProCyon/{dataset_name}/full_captions.tsv.gz  \
   --llm_phenotypes_path /path/to/llm_phenotypes/{dataset_name}.captions.csv \
   --output_path judge_prompts.csv
@@ -110,10 +114,31 @@ Given the judge prompts, one can then use these to query the judge model of choi
 selected as a frontier LLM that could be used to evaluate GPT-4o phenotypes without worrying about any self-bias that may be introduced by using
 GPT-4o as a judge of its own outputs.
 
-## Parsing LLM-as-a-Judge results
+### Parsing LLM-as-a-Judge results
 We provide example judge prompts and responses within the ProCyon-Instruct dataset [here](https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct/tree/main/experimental_data/llm_judge_eval/judge_responses), which allow for recreating the results shown in Figure 4D. Our particular outputs are CSV
 files containing the judge response as well as a `finish_reason` column that describes whether the response was truncated
 due to max length constraints when querying the judge LLM.
 
 For an example of how to parse LLM judge results, please refer to the notebook `parse_llm_judge_results.ipynb`, which contains the code
 used to parse responses into final decisions across both permutations, including tiebreaking as described in our manuscript.
+
+## Reference-based metrics
+Automated reference-based metrics, as shown in the lower facet of Figure 4B, can be generated for ProCyon models using
+the evaluation framework described [here](https://github.com/mims-harvard/ProCyon/tree/main/procyon/evaluate).
+
+For generating such metrics for phenotypes generated from an external LLM, we provide the `llm_reference_eval.py` script,
+which serves as an entrypoint into the portion of the evaluation framework that measures phenotype generation quality and
+can be called as follows:
+```
+/path/to/ProCyon/examples/paper_analyses/external_llm_eval/llm_reference_eval.py \
+        --it_data_config_yml dataset_config.yml \
+        --llm_captions_dir /path/to/llm_outputs/ \
+        --suffix llm_outputs_suffix.csv \
+        --outdir /path/to/outdir
+```
+The script takes in the same YAML dataset config as was used for the `generate_llm_prompts.py` script described above,
+as well as the path to a directory containing the external LLM generations as CSVs, called `llm_outputs` in the example
+above. `llm_outputs` should contain CSVs named like `{dataset}.{suffix}` where the expected naming of datasets can be
+seen in the outputs of the `generate_llm_prompts.py` script.
+
+The structure of the resulting output directory mirrors that of the caption portion of an evaluation framework run.
