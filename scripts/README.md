@@ -4,7 +4,7 @@ These scripts assist users with running queries on and evaluating ProCyon.
 
 `run_eval_framework.py`: 
 ------------------------
-Evaluation framework script. Coming soon: Usage
+Entrypoint for running the evaluation framework to benchmark ProCyon models against other baselines and models across datasets and tasks. For detailed instructions, please see the [evaluation framework README](https://github.com/mims-harvard/ProCyon/tree/main/procyon/evaluate).
 
 `caption_bulk.py`:
 ------------------
