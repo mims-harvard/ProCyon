@@ -1,9 +1,10 @@
 # External LLM evaluation
-This directory contains the scripts necessary to recreate our experiments comparing ProCyon model phenotype generation
+This directory contains the scripts necessary to recreate our experiments comparing ProCyon phenotype generation
 to vanilla LLMs. These results are largely those presented in Figures 4B, C, D in our manuscript. These results can be
 broadly divided into two categories:
-- LLM-based ranking, referred to as an [LLM-as-a-Judge approach](https://arxiv.org/abs/2306.05685)
-- reference-based metrics calculated directly against reference phenotypes (e.g. BERTScore, ROUGE, BLEU)
+- [LLM-based ranking](https://github.com/mims-harvard/ProCyon/tree/main/examples/paper_analyses/external_llm_eval#llm-as-a-judge), referred to as an [LLM-as-a-Judge approach](https://arxiv.org/abs/2306.05685)
+- [Reference-based metrics](https://github.com/mims-harvard/ProCyon/tree/main/examples/paper_analyses/external_llm_eval#reference-based-metrics) calculated directly against reference phenotypes (e.g. BERTScore, ROUGE, BLEU)
+
 The steps to reproduce both comparison methods are described below.
 
 ## LLM-as-a-Judge
