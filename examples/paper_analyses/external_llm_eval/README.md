@@ -25,7 +25,7 @@ under-studied proteins, we perform subsampling stratified by [UniProt annotation
 
 The notebook used for our subsampling is `select_llm_samples.ipynb`, and should recreate the exact subset of proteins used for
 our analyses, but the precomputed protein subsets as well as the UniProt annotation scores used can also be found in the
-[ProCyon-Instruct dataset](https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct/tree/main/experimental_data/llm_judge_eval/selected_caption_samples).
+[ProCyon-Instruct dataset](https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct/tree/main/experimental_data/external_llm_eval/selected_caption_samples).
 
 ## Generate ProCyon phenotype descriptions
 Generating phenotype descriptions from a ProCyon model can be accomplished using the evaluation framework. If using a protein subset as
@@ -68,7 +68,7 @@ tasks in the corresponding dataset entry. If generating a QA prompt, the output 
 
 The script can be run as follows:
 ```
-/path/to/ProCyon/examples/paper_analyses/llm_judge_phenotype_eval/generate_llm_prompts.py \
+/path/to/ProCyon/examples/paper_analyses/external_llm_eval/generate_llm_prompts.py \
   --it_data_config_yml dataset_config.yml \
   --encoding aaseq
 ```
@@ -91,7 +91,7 @@ ranking across the two permutations.
 
 We generate the judge prompts using the `generate_judge_prompts.py` script as follows:
 ```
-/path/to/ProCyon/examples/paper_analyses/llm_judge_phenotype_eval/generate_judge_prompts.py \
+/path/to/ProCyon/examples/paper_analyses/external_llm_eval/generate_judge_prompts.py \
   --procyon_phenotypes_path  /path/to/procyon_eval/caption/ProCyon/{dataset_name}/full_captions.tsv.gz  \
   --llm_phenotypes_path /path/to/llm_phenotypes/{dataset_name}.captions.csv \
   --output_path judge_prompts.csv
