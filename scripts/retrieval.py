@@ -1,6 +1,7 @@
 import os
 import math
-from typing import Dict, Optional, Tuple,
+from typing import Dict, Optional, Tuple
+from pathlib import Path
 
 import argparse
 from huggingface_hub import login as hf_login
@@ -50,7 +51,7 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, Dict]:
     return model, device, data_args
 
 
-def run_retrieval(task_desc_infile: str,
+def run_retrieval(task_desc_infile: Path,
         inference_bool: bool = True):
     """
     This function demonstrates how to use the pre-trained ProCyon model ProCyon-Full to perform protein retrieval
