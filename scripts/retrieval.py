@@ -187,4 +187,4 @@ if __name__ == "__main__":
 
 
 
-    run_retrieval(args.task_desc_infile, args.inferece_bool)
+    run_retrieval(args.task_desc_infile, args.inference_bool)
