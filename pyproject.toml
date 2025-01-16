@@ -20,6 +20,7 @@ dependencies = [
    "jupyter==1.0.0",
    "kiwisolver==1.4.5",
    "llvmlite==0.42.0",
+   "loguru==0.7.3",
    "matplotlib==3.8.3",
    "multiprocess==0.70.16",
    "networkx==3.2.1",
@@ -50,6 +51,7 @@ dependencies = [
    "virtualenv==20.28.0",
    "wandb==0.16.3",
    "bert-score>=0.3.13",
+   "argparse>=1.4.0",
 ]
 
 [project.optional-dependencies]
