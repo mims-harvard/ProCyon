@@ -181,6 +181,7 @@ if __name__ == "__main__":
         "--inference_bool",
         action="store_false",
         help="OPTIONAL; choose this if you do not intend to do inference or load the model",
+        default=True,
     )
     args = parser.parse_args()
 
