@@ -23,11 +23,12 @@ from procyon.data.inference_utils import (
 )
 from procyon.evaluate.framework.utils import move_inputs_to_device
 from procyon.model.model_unified import UnifiedProCyon
+from procyon.training.train_utils import DataArgs
 
 CKPT_NAME = os.path.expanduser(os.getenv("CHECKPOINT_PATH"))
 
 
-def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, Dict]:
+def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
     # Load the pre-trained ProCyon model
     logger.info("Loading pretrained model")
     # Replace with the path where you downloaded a pre-trained ProCyon model (e.g. ProCyon-Full)
