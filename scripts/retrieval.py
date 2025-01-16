@@ -1,6 +1,6 @@
 import os
 import math
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple,
 
 import argparse
 from huggingface_hub import login as hf_login
@@ -50,17 +50,21 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, Dict]:
     return model, device, data_args
 
 
-def run_retrieval(args):
+def run_retrieval(task_desc_infile: str,
+        inference_bool: bool = True):
     """
     This function demonstrates how to use the pre-trained ProCyon model ProCyon-Full to perform protein retrieval
     for a given drug and disease.
     """
 
+    if task_desc_infile is None:
+        raise ValueError("task_desc_infile must be provided")
+
     logger.info("Logging into huggingface hub")
     hf_login(token=os.getenv("HF_TOKEN"))
     logger.info("Done logging into huggingface hub")
 
-    if args.inference_bool:
+    if inference_bool:
         # load the pre-trained ProCyon model
         model, device, data_args = load_model_onto_device()
 
@@ -179,4 +183,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    run_retrieval(args)
+
+
+    run_retrieval(args.task_desc_infile, args.inferece_bool)
