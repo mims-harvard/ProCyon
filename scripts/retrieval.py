@@ -69,6 +69,11 @@ def run_retrieval(task_desc_infile: Path,
     if inference_bool:
         # load the pre-trained ProCyon model
         model, device, data_args = load_model_onto_device()
+    else:
+        # loading the model takes much time and memory, so we skip it if we don't need it
+        model = None
+        device = None
+        data_args = None
 
     # Load the pre-calculated protein target embeddings
     logger.info("Load protein target embeddings")
