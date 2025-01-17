@@ -13,9 +13,6 @@ import pandas as pd
 import seaborn as sns
 import torch
 
-from scipy import stats
-from tqdm import trange
-
 from procyon.data.data_utils import DATA_DIR
 from procyon.data.inference_utils import (
     create_input_retrieval,
