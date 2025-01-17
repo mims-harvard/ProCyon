@@ -7,7 +7,7 @@ import pandas as pd
 from loguru import logger
 
 # Import the key functions from the existing codebase
-from scripts.protein_retrieval_disease_pheno import startup_retrieval, do_retrieval
+from procyon.inference.retrieval_utils import startup_retrieval, do_retrieval
 
 app = FastAPI()
 
