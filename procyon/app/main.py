@@ -29,7 +29,7 @@ async def startup_event():
         raise EnvironmentError("HF_TOKEN environment variable not set")
     if not os.getenv("CHECKPOINT_PATH"):
         raise EnvironmentError("CHECKPOINT_PATH environment variable not set")
-    if not os.getenf("HOME_DIR"):
+    if not os.getenv("HOME_DIR"):
         raise EnvironmentError("HOME_DIR environment variable not set")
     if not os.getenv("DATA_DIR"):
         raise EnvironmentError("DATA_DIR environment variable not set")
