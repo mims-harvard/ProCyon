@@ -61,8 +61,10 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
 
 
 def startup_retrieval(
-    inference_bool: bool = True
-) -> Tuple[Union[UnifiedProCyon, None], Union[torch.device, None], Union[DataArgs,None]]:
+    inference_bool: bool = True,
+) -> Tuple[
+    Union[UnifiedProCyon, None], Union[torch.device, None], Union[DataArgs, None]
+]:
     """
     This function performs startup functions to initiate protein retrieval:
     Logs into the huggingface hub and loads the pre-trained ProCyon model.
@@ -108,9 +110,7 @@ def single_retrieval(
         None
     """
 
-    model, device, data_args = startup_retrieval(
-        task_desc_infile, disease_desc_infile, inference_bool
-    )
+    model, device, data_args = startup_retrieval(inference_bool)
 
     results_df = do_retrieval(
         model=model,
