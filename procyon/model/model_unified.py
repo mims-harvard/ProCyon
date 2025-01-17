@@ -1088,7 +1088,8 @@ class UnifiedProCyon(nn.Module):
     def _init_tokenizer(self):
         if self.config.text_encoder_fname.lower().startswith('llama'):
             if "llama-3" in self.config.text_encoder_fname.lower():
-                self.tokenizer = transformers.AutoTokenizer.from_pretrained('meta-llama/Meta-Llama-3-8B', trust_remote_code=True, cache_dir = f"{DATA_DIR}/model_weights/llama-3-8b")
+                llama_path = os.getenv("LLAMA3_PATH")
+                self.tokenizer = transformers.AutoTokenizer.from_pretrained(llama_path)
                 self.tokenizer.padding_side = 'right'
             else:
                 self.tokenizer = transformers.LlamaTokenizer.from_pretrained(os.path.join(self.pretrained_weights_dir, self.config.text_encoder_fname))
