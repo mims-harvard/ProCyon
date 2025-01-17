@@ -53,18 +53,10 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
     return model, device, data_args
 
 
-def run_retrieval(
+def startup_retrieval(
     task_desc_infile: Path, disease_desc_infile: Path, inference_bool: bool = True
 ):
-    """
-    This function uses the pre-trained ProCyon model to perform protein retrieval
-    for a given disease using DisGeNET data.
-    """
 
-    if task_desc_infile is None:
-        raise ValueError("task_desc_infile must be provided.")
-    if disease_desc_infile is None:
-        raise ValueError("disease_desc_infile must be provided.")
     if inference_bool:
         logger.info("Inference is enabled.")
     else:
@@ -83,6 +75,43 @@ def run_retrieval(
         device = None
         data_args = None
 
+    return model, device, data_args
+
+
+def single_retrieval(
+    task_desc_infile: Path, disease_desc_infile: Path, inference_bool: bool = True
+):
+    """
+    This function uses the pre-trained ProCyon model to perform protein retrieval
+    for a given disease using DisGeNET data.
+    """
+
+    model, device, data_args = startup_retrieval(
+        task_desc_infile, disease_desc_infile, inference_bool
+    )
+
+    do_retrieval(
+        model=model,
+        data_args=data_args,
+        device=device,
+        inference_bool=inference_bool,
+        task_desc_infile=task_desc_infile,
+        disease_desc_infile=disease_desc_infile,
+    )
+
+    logger.info("DONE WITH ALL WORK")
+
+
+def do_retrieval(
+    model: UnifiedProCyon,
+    data_args: DataArgs,
+    device: torch.device,
+    inference_bool: bool = True,
+    task_desc_infile: Path = None,
+    disease_desc_infile: Path = None,
+    task_desc: str = None,
+    disease_desc: str = None,
+) -> Optional[pd.DataFrame]:
     # Load the pre-calculated protein target embeddings
     logger.info("Load protein target embeddings")
     all_protein_embeddings, all_protein_ids = torch.load(
@@ -93,24 +122,38 @@ def run_retrieval(
         f"shape of precalculated embeddings matrix: {all_protein_embeddings.shape}"
     )
 
+    #
     logger.info("entering task description and prompt")
-    # read the task description from a file
-    with open(args.task_desc_infile, "r") as f:
-        task_desc = f.read()
-    task_desc = task_desc.replace("\n", " ")
-    logger.info(f"Task description: {task_desc}")
+    if task_desc_infile is not None:
+        if task_desc is not None:
+            raise ValueError(
+                "Only one of task_desc_infile and task_desc can be provided."
+            )
+        # read the task description from a file
+        with open(task_desc_infile, "r") as f:
+            task_desc = f.read()
+    elif task_desc is None:
+        raise ValueError("Either task_desc_infile or task_desc must be provided.")
 
-    # read the disease description from a file
-    with open(args.disease_desc_infile, "r") as f:
-        disease_desc = f.read()
+    if disease_desc_infile is not None:
+        if disease_desc is not None:
+            raise ValueError(
+                "Only one of disease_desc_infile and disease_desc can be provided."
+            )
+        # read the disease description from a file
+        with open(disease_desc_infile, "r") as f:
+            disease_desc = f.read()
+    elif disease_desc is None:
+        raise ValueError("Either disease_desc_infile or disease_desc must be provided.")
+
+    task_desc = task_desc.replace("\n", " ")
     disease_desc = disease_desc.replace("\n", " ")
     disease_prompt = "Disease: {}".format(disease_desc)
 
     logger.info("Done entering task description and prompt")
 
-    logger.info("Now performing protein retrieval for example 1")
-
     if inference_bool:
+        logger.info("Now performing protein retrieval for example 1")
 
         # Create input for retrieval
         input_simple = create_input_retrieval(
@@ -138,7 +181,7 @@ def run_retrieval(
 
         logger.info("Done performaing protein retrieval for example 1")
 
-    logger.info("DONE WITH ALL WORK")
+        return df_dep
 
 
 if __name__ == "__main__":
@@ -161,4 +204,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    run_retrieval(args.task_desc_infile, args.disease_desc_infile, args.inference_bool)
+    single_retrieval(
+        args.task_desc_infile, args.disease_desc_infile, args.inference_bool
+    )
