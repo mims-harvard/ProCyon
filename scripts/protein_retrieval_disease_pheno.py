@@ -46,16 +46,16 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
     model.bfloat16()  # Quantize the model to a smaller precision
     _ = model.eval()
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     logger.info("Done loading model and applying it to compute device")
 
     return model, device, data_args
 
 
-def run_retrieval(task_desc_infile: Path,
-                 disease_desc_infile: Path,
-                 inference_bool: bool = True):
+def run_retrieval(
+    task_desc_infile: Path, disease_desc_infile: Path, inference_bool: bool = True
+):
     """
     This function uses the pre-trained ProCyon model to perform protein retrieval
     for a given disease using DisGeNET data.
@@ -131,7 +131,9 @@ def run_retrieval(task_desc_infile: Path,
                 aaseq_type="protein",
             )
         # The script can run up to here without a GPU, but the following line requires a GPU
-        df_dep = get_proteins_from_embedding(all_protein_embeddings, model_out, top_k=None)
+        df_dep = get_proteins_from_embedding(
+            all_protein_embeddings, model_out, top_k=None
+        )
         logger.info(f"top results: {df_dep.head(10).to_dict(orient='records')}")
 
         logger.info("Done performaing protein retrieval for example 1")
