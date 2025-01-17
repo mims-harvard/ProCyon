@@ -1,20 +1,12 @@
 import os
-import math
 from typing import Dict, Optional, Tuple
 from pathlib import Path
 
 import argparse
 from huggingface_hub import login as hf_login
 from loguru import logger
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import seaborn as sns
 import torch
-
-from scipy import stats
-from tqdm import trange
 
 from procyon.data.data_utils import DATA_DIR
 from procyon.data.inference_utils import (
@@ -91,7 +83,6 @@ def run_retrieval(task_desc_infile: Path,
         device = None
         data_args = None
 
-    # TODO: generate a script that generically handles retrieval
     # Load the pre-calculated protein target embeddings
     logger.info("Load protein target embeddings")
     all_protein_embeddings, all_protein_ids = torch.load(
@@ -102,24 +93,6 @@ def run_retrieval(task_desc_infile: Path,
         f"shape of precalculated embeddings matrix: {all_protein_embeddings.shape}"
     )
 
-    logger.info("Loading DrugBank info")
-    # Load DrugBank info, namely the mapping from DrugBank IDs to mechanism
-    # of action descriptions and ProCyon-Instruct numeric IDs.
-    drugbank_info = pd.read_pickle(
-        os.path.join(
-            DATA_DIR,
-            "integrated_data",
-            "v1",
-            "drugbank",
-            "drugbank_info_filtered_composed.pkl",
-        )
-    )
-    db_map = {row["drugbank_id"]: row["moa"] for _, row in drugbank_info.iterrows()}
-    db_idx_map = {
-        row["drugbank_id"]: row["index"] for _, row in drugbank_info.iterrows()
-    }
-    logger.info("Done loading DrugBank info")
-
     logger.info("entering task description and prompt")
     # read the task description from a file
     with open(args.task_desc_infile, "r") as f:
@@ -127,16 +100,11 @@ def run_retrieval(task_desc_infile: Path,
     task_desc = task_desc.replace("\n", " ")
     logger.info(f"Task description: {task_desc}")
 
-    # Next we set up the specific prompt contexts provided for retrieval using bupropion and depression.
-    db_id = "DB01156" # DrugBank ID for bupropion
-    drug_desc = db_map[db_id] # the drug description from the DrugBank map
-
     # read the disease description from a file
     with open(args.disease_desc_infile, "r") as f:
         disease_desc = f.read()
     disease_desc = disease_desc.replace("\n", " ")
-    disease_prompt = "Disease: {} Drug: {}".format(disease_desc, drug_desc)
-    logger.info(f"Task description: {disease_prompt}")
+    disease_prompt = "Disease: {}".format(disease_desc)
 
     logger.info("Done entering task description and prompt")
 
@@ -148,7 +116,6 @@ def run_retrieval(task_desc_infile: Path,
         input_simple = create_input_retrieval(
             input_description=disease_prompt,
             data_args=data_args,
-            drug_input_idx=db_idx_map[db_id],
             task_definition=task_desc,
             instruction_source_dataset="disgenet",  # Changed from "drugbank" to "disgenet"
             instruction_source_relation="all",
@@ -191,7 +158,5 @@ if __name__ == "__main__":
         default=True,
     )
     args = parser.parse_args()
-
-
 
     run_retrieval(args.task_desc_infile, args.disease_desc_infile, args.inference_bool)
