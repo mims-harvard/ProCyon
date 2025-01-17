@@ -33,9 +33,16 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
     logger.info("Loading pretrained model")
     # Replace with the path where you downloaded a pre-trained ProCyon model (e.g. ProCyon-Full)
     data_args = torch.load(os.path.join(CKPT_NAME, "data_args.pt"))
-
     model, _ = UnifiedProCyon.from_pretrained(checkpoint_dir=CKPT_NAME)
     logger.info("Done loading pretrained model")
+
+    logger.info("Quantizing the model to a smaller precision")
+    model.bfloat16()  # Quantize the model to a smaller precision
+    logger.info("Done quantizing the model to a smaller precision")
+
+    logger.info("Setting the model to evaluation mode")
+    model.eval()
+    logger.info("Done setting the model to evaluation mode")
 
     logger.info("Applying pretrained model to device")
     logger.info(f"Total memory allocated by PyTorch: {torch.cuda.memory_allocated()}")
@@ -47,7 +54,9 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
     model.bfloat16()  # Quantize the model to a smaller precision
     _ = model.eval()
 
-    logger.info("Done applying pretrain model to device")
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
+    logger.info("Done loading model and applying it to compute device")
 
     return model, device, data_args
 
