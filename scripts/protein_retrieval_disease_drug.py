@@ -139,18 +139,18 @@ def run_retrieval(task_desc_infile: Path,
 
     logger.info("Now performing protein retrieval for example 1")
 
-    input_simple = create_input_retrieval(
-        input_description=disease_prompt,
-        data_args=data_args,
-        drug_input_idx=db_idx_map[db_id],
-        task_definition=task_desc,
-        instruction_source_dataset="drugbank",
-        instruction_source_relation="drug_target",  # "all" - disgenet, omim, uniprot, reactome
-        aaseq_type="protein",
-        icl_example_number=1,  # 0, 1, 2
-    )
-
     if inference_bool:
+        input_simple = create_input_retrieval(
+            input_description=disease_prompt,
+            data_args=data_args,
+            drug_input_idx=db_idx_map[db_id],
+            task_definition=task_desc,
+            instruction_source_dataset="drugbank",
+            instruction_source_relation="drug_target",  # "all" - disgenet, omim, uniprot, reactome
+            aaseq_type="protein",
+            icl_example_number=1,  # 0, 1, 2
+        )
+
         input_simple = move_inputs_to_device(input_simple, device=device)
         with torch.no_grad():
             model_out = model(
