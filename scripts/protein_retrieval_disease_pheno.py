@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Union
 from pathlib import Path
 
 import argparse
@@ -21,6 +21,13 @@ CKPT_NAME = os.path.expanduser(os.getenv("CHECKPOINT_PATH"))
 
 
 def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
+    """
+    Load the pre-trained ProCyon model and move it to the compute device.
+    Returns:
+        model (UnifiedProCyon): The pre-trained ProCyon model
+        device (torch.device): The compute device (GPU or CPU) on which the model is loaded
+        data_args (DataArgs): The data arguments defined by the pre-trained model
+    """
     # Load the pre-trained ProCyon model
     logger.info("Loading pretrained model")
     # Replace with the path where you downloaded a pre-trained ProCyon model (e.g. ProCyon-Full)
@@ -54,22 +61,31 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
 
 
 def startup_retrieval(
-    task_desc_infile: Path, disease_desc_infile: Path, inference_bool: bool = True
-):
-
-    if inference_bool:
-        logger.info("Inference is enabled.")
-    else:
-        logger.info("Inference is disabled.")
+    inference_bool: bool = True
+) -> Tuple[Union[UnifiedProCyon, None], Union[torch.device, None], Union[DataArgs,None]]:
+    """
+    This function performs startup functions to initiate protein retrieval:
+    Logs into the huggingface hub and loads the pre-trained ProCyon model.
+    Args:
+        inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference;
+        then the model will not be loaded.
+    Returns:
+        model (UnifiedProCyon): The pre-trained ProCyon model
+        device (torch.device): The compute device (GPU or CPU) on which the model is loaded
+        data_args (DataArgs): The data arguments defined by the pre-trained model
+    """
 
     logger.info("Logging into huggingface hub")
     hf_login(token=os.getenv("HF_TOKEN"))
     logger.info("Done logging into huggingface hub")
 
     if inference_bool:
+        logger.info("Inference is enabled.")
+
         # load the pre-trained ProCyon model
         model, device, data_args = load_model_onto_device()
     else:
+        logger.info("Inference is disabled.")
         # loading the model takes much time and memory, so we skip it if we don't need it
         model = None
         device = None
@@ -80,17 +96,23 @@ def startup_retrieval(
 
 def single_retrieval(
     task_desc_infile: Path, disease_desc_infile: Path, inference_bool: bool = True
-):
+) -> Union[pd.DataFrame, None]:
     """
-    This function uses the pre-trained ProCyon model to perform protein retrieval
+    This function uses the pre-trained ProCyon model to perform one protein retrieval run
     for a given disease using DisGeNET data.
+    Args:
+        task_desc_infile (Path): The path to the file containing the task description.
+        disease_desc_infile (Path): The path to the file containing the disease description.
+        inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference
+    Returns:
+        None
     """
 
     model, device, data_args = startup_retrieval(
         task_desc_infile, disease_desc_infile, inference_bool
     )
 
-    do_retrieval(
+    results_df = do_retrieval(
         model=model,
         data_args=data_args,
         device=device,
@@ -98,6 +120,8 @@ def single_retrieval(
         task_desc_infile=task_desc_infile,
         disease_desc_infile=disease_desc_infile,
     )
+    if results_df is not None:
+        logger.info(f"top results: {results_df.head(10).to_dict(orient='records')}")
 
     logger.info("DONE WITH ALL WORK")
 
@@ -112,6 +136,20 @@ def do_retrieval(
     task_desc: str = None,
     disease_desc: str = None,
 ) -> Optional[pd.DataFrame]:
+    """
+    This function performs protein retrieval for a given disease using the pre-trained ProCyon model.
+    Args:
+        model (UnifiedProCyon): The pre-trained ProCyon model
+        data_args (DataArgs): The data arguments defined by the pre-trained model
+        device (torch.device): The compute device (GPU or CPU) on which the model is loaded
+        inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference
+        task_desc_infile (Path): The path to the file containing the task description.
+        disease_desc_infile (Path): The path to the file containing the disease description.
+        task_desc (str): The task description.
+        disease_desc (str): The disease description.
+    Returns:
+        df_dep (pd.DataFrame): The DataFrame containing the top protein retrieval results
+    """
     # Load the pre-calculated protein target embeddings
     logger.info("Load protein target embeddings")
     all_protein_embeddings, all_protein_ids = torch.load(
@@ -177,7 +215,6 @@ def do_retrieval(
         df_dep = get_proteins_from_embedding(
             all_protein_embeddings, model_out, top_k=None
         )
-        logger.info(f"top results: {df_dep.head(10).to_dict(orient='records')}")
 
         logger.info("Done performaing protein retrieval for example 1")
 
