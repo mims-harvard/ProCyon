@@ -24,12 +24,18 @@ class RetrievalRequest(BaseModel):
 async def startup_event():
     """Initialize the model and required components on startup"""
     global model, device, data_args
-    
+
     if not os.getenv("HF_TOKEN"):
         raise EnvironmentError("HF_TOKEN environment variable not set")
     if not os.getenv("CHECKPOINT_PATH"):
         raise EnvironmentError("CHECKPOINT_PATH environment variable not set")
-    
+    if not os.getenf("HOME_DIR"):
+        raise EnvironmentError("HOME_DIR environment variable not set")
+    if not os.getenv("DATA_DIR"):
+        raise EnvironmentError("DATA_DIR environment variable not set")
+    if not os.getenv("LLAMA3_PATH"):
+        raise EnvironmentError("LLAMA3_PATH environment variable not set")
+
     # Use the existing startup_retrieval function
     model, device, data_args = startup_retrieval(inference_bool=True)
     logger.info("Model loaded and ready")
