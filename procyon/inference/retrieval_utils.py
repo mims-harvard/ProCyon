@@ -166,7 +166,7 @@ def do_retrieval(
             input_description=disease_prompt,
             data_args=data_args,
             task_definition=task_desc,
-            instruction_source_dataset="disgenet",  # Changed from "drugbank" to "disgenet"
+            instruction_source_dataset="disgenet",  # "omim" or "disgenet"
             instruction_source_relation="all",
             aaseq_type="protein",
             icl_example_number=1,  # 0, 1, 2
