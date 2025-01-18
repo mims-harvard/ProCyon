@@ -85,7 +85,9 @@ if __name__ == "__main__":
     An example request can be made using curl:
     curl -X POST "http://localhost:8000/retrieve" \
      -H "Content-Type: application/json" \
-     -d '{"task_desc": "Find proteins related to this disease", "disease_desc": "Major depressive disorder"}'
+     -d '{"task_desc": "Find proteins related to this disease", 
+          "disease_desc": "Major depressive disorder",
+          "instruction_source_dataset": "disgenet"}'
     """
     import uvicorn
 
