@@ -5,16 +5,6 @@ from pathlib import Path
 import argparse
 from loguru import logger
 import pandas as pd
-import torch
-
-from procyon.data.data_utils import DATA_DIR
-from procyon.data.inference_utils import (
-    create_input_retrieval,
-    get_proteins_from_embedding,
-)
-from procyon.evaluate.framework.utils import move_inputs_to_device
-from procyon.model.model_unified import UnifiedProCyon
-from procyon.training.train_utils import DataArgs
 
 from procyon.inference.retrieval_utils import startup_retrieval, do_retrieval
 
@@ -22,7 +12,10 @@ CKPT_NAME = os.path.expanduser(os.getenv("CHECKPOINT_PATH"))
 
 
 def single_retrieval(
-    task_desc_infile: Path, disease_desc_infile: Path, inference_bool: bool = True
+    task_desc_infile: Path,
+    disease_desc_infile: Path,
+    instruction_source_dataset: str,
+    inference_bool: bool = True,
 ) -> Union[pd.DataFrame, None]:
     """
     This function uses the pre-trained ProCyon model to perform one protein retrieval run
@@ -30,11 +23,11 @@ def single_retrieval(
     Args:
         task_desc_infile (Path): The path to the file containing the task description.
         disease_desc_infile (Path): The path to the file containing the disease description.
+        instruction_source_dataset (str): Dataset source for instructions - either "disgenet" or "omim"
         inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference
     Returns:
-        None
+        Optional[pd.DataFrame]: DataFrame with results if inference_bool is True, None otherwise
     """
-
     model, device, data_args = startup_retrieval(inference_bool)
 
     results_df = do_retrieval(
@@ -44,11 +37,13 @@ def single_retrieval(
         inference_bool=inference_bool,
         task_desc_infile=task_desc_infile,
         disease_desc_infile=disease_desc_infile,
+        instruction_source_dataset=instruction_source_dataset,
     )
     if results_df is not None:
         logger.info(f"top results: {results_df.head(10).to_dict(orient='records')}")
 
     logger.info("DONE WITH ALL WORK")
+    return results_df
 
 
 if __name__ == "__main__":
@@ -69,8 +64,17 @@ if __name__ == "__main__":
         help="OPTIONAL; choose this if you do not intend to do inference or load the model",
         default=True,
     )
+    parser.add_argument(
+        "--instruction_source_dataset",
+        type=str,
+        choices=["disgenet", "omim"],
+        help="Dataset source for instructions - either 'disgenet' or 'omim'",
+    )
     args = parser.parse_args()
 
     single_retrieval(
-        args.task_desc_infile, args.disease_desc_infile, args.inference_bool
+        args.task_desc_infile,
+        args.disease_desc_infile,
+        args.inference_bool,
+        args.instruction_source_dataset,
     )

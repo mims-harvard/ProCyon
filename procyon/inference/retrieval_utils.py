@@ -98,6 +98,7 @@ def do_retrieval(
     model: UnifiedProCyon,
     data_args: DataArgs,
     device: torch.device,
+    instruction_source_dataset: str,
     inference_bool: bool = True,
     task_desc_infile: Path = None,
     disease_desc_infile: Path = None,
@@ -115,9 +116,15 @@ def do_retrieval(
         disease_desc_infile (Path): The path to the file containing the disease description.
         task_desc (str): The task description.
         disease_desc (str): The disease description.
+        instruction_source_dataset (str): Dataset source for instructions - either "disgenet" or "omim"
     Returns:
         df_dep (pd.DataFrame): The DataFrame containing the top protein retrieval results
     """
+    if instruction_source_dataset not in ["disgenet", "omim"]:
+        raise ValueError(
+            'instruction_source_dataset must be either "disgenet" or "omim"'
+        )
+
     # Load the pre-calculated protein target embeddings
     logger.info("Load protein target embeddings")
     all_protein_embeddings, all_protein_ids = torch.load(
@@ -166,7 +173,7 @@ def do_retrieval(
             input_description=disease_prompt,
             data_args=data_args,
             task_definition=task_desc,
-            instruction_source_dataset="disgenet",  # "omim" or "disgenet"
+            instruction_source_dataset=instruction_source_dataset,
             instruction_source_relation="all",
             aaseq_type="protein",
             icl_example_number=1,  # 0, 1, 2
