@@ -23,7 +23,7 @@ class RetrievalRequest(BaseModel):
     instruction_source_dataset: str = Field(
         description="Dataset source for instructions - either 'disgenet' or 'omim'"
     )
-    k: int = Field(default=1000, description="Number of top results to return", ge=1)
+    k: Optional[int] = Field(default=None, description="Number of top results to return. If None, returns all results", ge=1)
 
 
 @app.on_event("startup")
@@ -66,7 +66,9 @@ async def retrieve_proteins(request: RetrievalRequest):
             instruction_source_dataset=request.instruction_source_dataset,
         )
 
-        # Return top k results
+        # Return all results if k is None, otherwise return top k
+        if request.k is None:
+            return {"results": results_df.to_dict(orient="records")}
         return {"results": results_df.head(request.k).to_dict(orient="records")}
 
     except ValueError as e:
@@ -88,7 +90,8 @@ if __name__ == "__main__":
      -H "Content-Type: application/json" \
      -d '{"task_desc": "Find proteins related to this disease", 
           "disease_desc": "Major depressive disorder",
-          "instruction_source_dataset": "disgenet"}'
+          "instruction_source_dataset": "disgenet",
+          "k": 1000}'
     """
     import uvicorn
 
