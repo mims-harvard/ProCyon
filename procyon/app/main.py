@@ -18,11 +18,12 @@ data_args = None
 
 
 class RetrievalRequest(BaseModel):
-    task_desc: str
-    disease_desc: str
+    task_desc: str = Field(description="The task description.")
+    disease_desc: str = Field(description="The disease description.")
     instruction_source_dataset: str = Field(
         description="Dataset source for instructions - either 'disgenet' or 'omim'"
     )
+    k: int = Field(default=1000, description="Number of top results to return", ge=1)
 
 
 @app.on_event("startup")
@@ -65,8 +66,8 @@ async def retrieve_proteins(request: RetrievalRequest):
             instruction_source_dataset=request.instruction_source_dataset,
         )
 
-        # Return top 1000 results
-        return {"results": results_df.head(1000).to_dict(orient="records")}
+        # Return top k results
+        return {"results": results_df.head(request.k).to_dict(orient="records")}
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
