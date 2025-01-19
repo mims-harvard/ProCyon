@@ -66,6 +66,8 @@ async def retrieve_proteins(request: RetrievalRequest):
             instruction_source_dataset=request.instruction_source_dataset,
         )
 
+        results_df = results_df.fillna('')
+
         # Return all results if k is None, otherwise return top k
         if request.k is None:
             return {"results": results_df.to_dict(orient="records")}
