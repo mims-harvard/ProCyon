@@ -84,11 +84,6 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
     model.to(device)
     logger.info(f"Total memory allocated by PyTorch: {torch.cuda.memory_allocated()}")
 
-    model.bfloat16()  # Quantize the model to a smaller precision
-    _ = model.eval()
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
     logger.info("Done loading model and applying it to compute device")
 
     return model, device, data_args
