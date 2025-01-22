@@ -76,6 +76,6 @@ if __name__ == "__main__":
     single_retrieval(
         args.task_desc_infile,
         args.disease_desc_infile,
-        args.inference_bool,
         args.instruction_source_dataset,
+        args.inference_bool,
     )
