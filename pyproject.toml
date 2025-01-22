@@ -53,7 +53,6 @@ dependencies = [
    "bert-score>=0.3.13",
    "argparse>=1.4.0",
    "huggingface-hub==0.23.4",
-   "loguru==0.7.3",
    "fastapi>=0.109.0",
    "uvicorn>=0.27.0",
 ]
