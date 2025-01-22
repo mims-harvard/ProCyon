@@ -61,10 +61,10 @@ async def retrieve_proteins(request: RetrievalRequest):
             model=model,
             data_args=data_args,
             device=device,
-            task_desc=request.task_desc,
-            disease_desc=request.disease_desc,
             instruction_source_dataset=request.instruction_source_dataset,
             all_protein_embeddings=all_protein_embeddings,
+            task_desc=request.task_desc,
+            disease_desc=request.disease_desc,
         )
 
         results_df = results_df.fillna('')
