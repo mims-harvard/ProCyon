@@ -156,16 +156,15 @@ def do_retrieval(
 
     task_desc = task_desc.replace("\n", " ")
     disease_desc = disease_desc.replace("\n", " ")
-    disease_prompt = "Disease: {}".format(disease_desc)
 
     logger.info("Done entering task description and prompt")
 
     if inference_bool:
-        logger.info("Now performing protein retrieval for example 1")
+        logger.info("Now performing protein retrieval")
 
         # Create input for retrieval
         input_simple = create_input_retrieval(
-            input_description=disease_prompt,
+            input_description=disease_desc,
             data_args=data_args,
             task_definition=task_desc,
             instruction_source_dataset=instruction_source_dataset,
