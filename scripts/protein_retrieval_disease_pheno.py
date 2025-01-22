@@ -70,6 +70,7 @@ if __name__ == "__main__":
         "--instruction_source_dataset",
         type=str,
         choices=["disgenet", "omim"],
+        default="omim",
         help="Dataset source for instructions - either 'disgenet' or 'omim'",
     )
     args = parser.parse_args()
