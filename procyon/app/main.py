@@ -29,7 +29,7 @@ class RetrievalRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """Initialize the model and required components on startup"""
-    global model, device, data_args
+    global model, device, data_args, all_protein_embeddings
 
     if not os.getenv("HF_TOKEN"):
         raise EnvironmentError("HF_TOKEN environment variable not set")
