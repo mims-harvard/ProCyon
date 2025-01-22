@@ -16,6 +16,7 @@ device = None
 data_args = None
 all_protein_embeddings = None
 
+
 class RetrievalRequest(BaseModel):
     task_desc: str = Field(description="The task description.")
     disease_desc: str = Field(description="The disease description.")
@@ -75,9 +76,9 @@ async def retrieve_proteins(request: RetrievalRequest):
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        logger.error(f"Error during retrieval: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    # except Exception as e:
+    #     logger.error(f"Error during retrieval: {str(e)}")
+    #     raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
