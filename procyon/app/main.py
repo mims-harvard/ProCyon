@@ -23,7 +23,11 @@ class RetrievalRequest(BaseModel):
     instruction_source_dataset: str = Field(
         description="Dataset source for instructions - either 'disgenet' or 'omim'"
     )
-    k: Optional[int] = Field(default=None, description="Number of top results to return. If None, returns all results", ge=1)
+    k: Optional[int] = Field(
+        default=None,
+        description="Number of top results to return. If None, returns all results",
+        ge=1,
+    )
 
 
 @app.on_event("startup")
@@ -43,7 +47,9 @@ async def startup_event():
         raise EnvironmentError("LLAMA3_PATH environment variable not set")
 
     # Use the existing startup_retrieval function
-    model, device, data_args, all_protein_embeddings = startup_retrieval(inference_bool=True)
+    model, device, data_args, all_protein_embeddings = startup_retrieval(
+        inference_bool=True
+    )
     logger.info("Model loaded and ready")
 
 
@@ -66,7 +72,7 @@ async def retrieve_proteins(request: RetrievalRequest):
         disease_desc=request.disease_desc,
     )
 
-    results_df = results_df.fillna('')
+    results_df = results_df.fillna("")
 
     # Return all results if k is None, otherwise return top k
     if request.k is None:

@@ -21,7 +21,10 @@ CKPT_NAME = os.path.expanduser(os.getenv("CHECKPOINT_PATH"))
 def startup_retrieval(
     inference_bool: bool = True,
 ) -> Tuple[
-    Union[UnifiedProCyon, None], Union[torch.device, None], Union[DataArgs, None], torch.Tensor
+    Union[UnifiedProCyon, None],
+    Union[torch.device, None],
+    Union[DataArgs, None],
+    torch.Tensor,
 ]:
     """
     This function performs startup functions to initiate protein retrieval:
