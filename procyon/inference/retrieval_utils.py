@@ -120,6 +120,7 @@ def do_retrieval(
             'instruction_source_dataset must be either "disgenet" or "omim"'
         )
 
+    # TODO get rid of this IO if we always do protein retrieval!
     # Load the pre-calculated protein target embeddings
     logger.info("Load protein target embeddings")
     all_protein_embeddings, all_protein_ids = torch.load(
