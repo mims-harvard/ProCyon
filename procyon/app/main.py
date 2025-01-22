@@ -52,33 +52,26 @@ async def retrieve_proteins(request: RetrievalRequest):
     """Endpoint to perform protein retrieval"""
     global model, device, data_args, all_protein_embeddings
 
-    if not all([model, device, data_args]):
+    if not all([model, device, data_args, all_protein_embeddings]):
         raise HTTPException(status_code=500, detail="Model not initialized")
 
-    try:
-        # Use the existing do_retrieval function
-        results_df = do_retrieval(
-            model=model,
-            data_args=data_args,
-            device=device,
-            instruction_source_dataset=request.instruction_source_dataset,
-            all_protein_embeddings=all_protein_embeddings,
-            task_desc=request.task_desc,
-            disease_desc=request.disease_desc,
-        )
+    # Use the existing do_retrieval function
+    results_df = do_retrieval(
+        model=model,
+        data_args=data_args,
+        device=device,
+        instruction_source_dataset=request.instruction_source_dataset,
+        all_protein_embeddings=all_protein_embeddings,
+        task_desc=request.task_desc,
+        disease_desc=request.disease_desc,
+    )
 
-        results_df = results_df.fillna('')
+    results_df = results_df.fillna('')
 
-        # Return all results if k is None, otherwise return top k
-        if request.k is None:
-            return {"results": results_df.to_dict(orient="records")}
-        return {"results": results_df.head(request.k).to_dict(orient="records")}
-
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    # except Exception as e:
-    #     logger.error(f"Error during retrieval: {str(e)}")
-    #     raise HTTPException(status_code=500, detail=str(e))
+    # Return all results if k is None, otherwise return top k
+    if request.k is None:
+        return {"results": results_df.to_dict(orient="records")}
+    return {"results": results_df.head(request.k).to_dict(orient="records")}
 
 
 if __name__ == "__main__":
