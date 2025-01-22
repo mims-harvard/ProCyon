@@ -34,12 +34,13 @@ def single_retrieval(
         model=model,
         data_args=data_args,
         device=device,
+        instruction_source_dataset=instruction_source_dataset,
+        all_protein_embeddings=all_protein_embeddings,
         inference_bool=inference_bool,
         task_desc_infile=task_desc_infile,
         disease_desc_infile=disease_desc_infile,
-        instruction_source_dataset=instruction_source_dataset,
-        all_protein_embeddings=all_protein_embeddings,
     )
+
     if results_df is not None:
         logger.info(f"top results: {results_df.head(10).to_dict(orient='records')}")
 
