@@ -31,11 +31,11 @@ def single_retrieval(
     model, device, data_args, all_protein_embeddings = startup_retrieval(inference_bool)
 
     results_df = do_retrieval(
-        model=model,
-        data_args=data_args,
-        device=device,
-        instruction_source_dataset=instruction_source_dataset,
-        all_protein_embeddings=all_protein_embeddings,
+        model,
+        data_args,
+        device,
+        instruction_source_dataset,
+        all_protein_embeddings,
         inference_bool=inference_bool,
         task_desc_infile=task_desc_infile,
         disease_desc_infile=disease_desc_infile,
