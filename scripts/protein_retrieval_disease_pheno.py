@@ -28,7 +28,7 @@ def single_retrieval(
     Returns:
         Optional[pd.DataFrame]: DataFrame with results if inference_bool is True, None otherwise
     """
-    model, device, data_args = startup_retrieval(inference_bool)
+    model, device, data_args, all_protein_embeddings = startup_retrieval(inference_bool)
 
     results_df = do_retrieval(
         model=model,
@@ -38,6 +38,7 @@ def single_retrieval(
         task_desc_infile=task_desc_infile,
         disease_desc_infile=disease_desc_infile,
         instruction_source_dataset=instruction_source_dataset,
+        all_protein_embeddings=all_protein_embeddings,
     )
     if results_df is not None:
         logger.info(f"top results: {results_df.head(10).to_dict(orient='records')}")

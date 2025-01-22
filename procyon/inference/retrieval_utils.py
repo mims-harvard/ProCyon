@@ -21,7 +21,7 @@ CKPT_NAME = os.path.expanduser(os.getenv("CHECKPOINT_PATH"))
 def startup_retrieval(
     inference_bool: bool = True,
 ) -> Tuple[
-    Union[UnifiedProCyon, None], Union[torch.device, None], Union[DataArgs, None]
+    Union[UnifiedProCyon, None], Union[torch.device, None], Union[DataArgs, None], torch.Tensor
 ]:
     """
     This function performs startup functions to initiate protein retrieval:
@@ -33,9 +33,11 @@ def startup_retrieval(
         model (UnifiedProCyon): The pre-trained ProCyon model
         device (torch.device): The compute device (GPU or CPU) on which the model is loaded
         data_args (DataArgs): The data arguments defined by the pre-trained model
+        all_protein_embeddings (torch.Tensor): The pre-calculated protein target embeddings
     """
+    logger.info("Now running startup functions for protein retrieval")
 
-    logger.info("Logging into huggingface hub")
+    logger.info("Now logging into huggingface hub")
     hf_login(token=os.getenv("HF_TOKEN"))
     logger.info("Done logging into huggingface hub")
 
@@ -51,7 +53,19 @@ def startup_retrieval(
         device = None
         data_args = None
 
-    return model, device, data_args
+    # Load the pre-calculated protein target embeddings
+    logger.info("Now loading protein target embeddings")
+    all_protein_embeddings, all_protein_ids = torch.load(
+        os.path.join(CKPT_NAME, "protein_target_embeddings.pkl")
+    )
+    all_protein_embeddings = all_protein_embeddings.float()
+    logger.info(
+        f"shape of precalculated embeddings matrix: {all_protein_embeddings.shape}"
+    )
+    logger.info("Done loading protein target embeddings")
+    logger.info("Done running startup functions for protein retrieval")
+
+    return model, device, data_args, all_protein_embeddings
 
 
 def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
@@ -63,21 +77,21 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
         data_args (DataArgs): The data arguments defined by the pre-trained model
     """
     # Load the pre-trained ProCyon model
-    logger.info("Loading pretrained model")
+    logger.info("Now loading pretrained model")
     # Replace with the path where you downloaded a pre-trained ProCyon model (e.g. ProCyon-Full)
     data_args = torch.load(os.path.join(CKPT_NAME, "data_args.pt"))
     model, _ = UnifiedProCyon.from_pretrained(checkpoint_dir=CKPT_NAME)
     logger.info("Done loading pretrained model")
 
-    logger.info("Quantizing the model to a smaller precision")
+    logger.info("Now quantizing the model to a smaller precision")
     model.bfloat16()  # Quantize the model to a smaller precision
     logger.info("Done quantizing the model to a smaller precision")
 
-    logger.info("Setting the model to evaluation mode")
+    logger.info("Now setting the model to evaluation mode")
     model.eval()
     logger.info("Done setting the model to evaluation mode")
 
-    logger.info("Applying pretrained model to device")
+    logger.info("Now applying pretrained model to device")
     logger.info(f"Total memory allocated by PyTorch: {torch.cuda.memory_allocated()}")
     # identify available devices on the machine
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -94,6 +108,7 @@ def do_retrieval(
     data_args: DataArgs,
     device: torch.device,
     instruction_source_dataset: str,
+    all_protein_embeddings: torch.Tensor,
     inference_bool: bool = True,
     task_desc_infile: Path = None,
     disease_desc_infile: Path = None,
@@ -106,32 +121,23 @@ def do_retrieval(
         model (UnifiedProCyon): The pre-trained ProCyon model
         data_args (DataArgs): The data arguments defined by the pre-trained model
         device (torch.device): The compute device (GPU or CPU) on which the model is loaded
+        instruction_source_dataset (str): Dataset source for instructions - either "disgenet" or "omim"
+        all_protein_embeddings (torch.Tensor): The pre-calculated protein target embeddings
         inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference
         task_desc_infile (Path): The path to the file containing the task description.
         disease_desc_infile (Path): The path to the file containing the disease description.
         task_desc (str): The task description.
         disease_desc (str): The disease description.
-        instruction_source_dataset (str): Dataset source for instructions - either "disgenet" or "omim"
     Returns:
         df_dep (pd.DataFrame): The DataFrame containing the top protein retrieval results
     """
+    logger.info("Now performing protein retrieval")
+
     if instruction_source_dataset not in ["disgenet", "omim"]:
         raise ValueError(
             'instruction_source_dataset must be either "disgenet" or "omim"'
         )
 
-    # TODO get rid of this IO if we always do protein retrieval!
-    # Load the pre-calculated protein target embeddings
-    logger.info("Load protein target embeddings")
-    all_protein_embeddings, all_protein_ids = torch.load(
-        os.path.join(CKPT_NAME, "protein_target_embeddings.pkl")
-    )
-    all_protein_embeddings = all_protein_embeddings.float()
-    logger.info(
-        f"shape of precalculated embeddings matrix: {all_protein_embeddings.shape}"
-    )
-
-    #
     logger.info("entering task description and prompt")
     if task_desc_infile is not None:
         if task_desc is not None:
@@ -157,7 +163,6 @@ def do_retrieval(
 
     task_desc = task_desc.replace("\n", " ")
     disease_desc = disease_desc.replace("\n", " ")
-
     logger.info("Done entering task description and prompt")
 
     if inference_bool:
@@ -186,6 +191,6 @@ def do_retrieval(
             all_protein_embeddings, model_out, top_k=None
         )
 
-        logger.info("Done performaing protein retrieval for example 1")
+        logger.info("Done performing protein retrieval")
 
         return df_dep

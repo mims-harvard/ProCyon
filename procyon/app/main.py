@@ -14,7 +14,7 @@ app = FastAPI()
 model = None
 device = None
 data_args = None
-
+all_protein_embeddings = None
 
 class RetrievalRequest(BaseModel):
     task_desc: str = Field(description="The task description.")
@@ -42,14 +42,14 @@ async def startup_event():
         raise EnvironmentError("LLAMA3_PATH environment variable not set")
 
     # Use the existing startup_retrieval function
-    model, device, data_args = startup_retrieval(inference_bool=True)
+    model, device, data_args, all_protein_embeddings = startup_retrieval(inference_bool=True)
     logger.info("Model loaded and ready")
 
 
 @app.post("/retrieve")
 async def retrieve_proteins(request: RetrievalRequest):
     """Endpoint to perform protein retrieval"""
-    global model, device, data_args
+    global model, device, data_args, all_protein_embeddings
 
     if not all([model, device, data_args]):
         raise HTTPException(status_code=500, detail="Model not initialized")
@@ -63,6 +63,7 @@ async def retrieve_proteins(request: RetrievalRequest):
             task_desc=request.task_desc,
             disease_desc=request.disease_desc,
             instruction_source_dataset=request.instruction_source_dataset,
+            all_protein_embeddings=all_protein_embeddings,
         )
 
         results_df = results_df.fillna('')
