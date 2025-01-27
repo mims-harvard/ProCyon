@@ -1,15 +1,20 @@
 import json
+import math
 import os
 
+from collections.abc import Callable
 from typing import (
     Dict,
     List,
     Optional,
 )
 
+import pandas as pd
+import numpy as np
 import torch
 import torch.nn.functional as F
-import pandas as pd
+
+from tqdm import trange
 
 from procyon.data.constants import (
     CAPTION_SUBSETS,
@@ -891,3 +896,42 @@ def get_proteins_from_embedding(
     df = pd.DataFrame({"uniprot_id": ids, "name": names, "sim_score": sim_sub})
 
     return df
+
+def perturb_by_words(
+    sentence: str, generator: np.random.Generator, perturbation_pct: float = 0.1
+) -> str:
+    """Generate perturbed description."""
+    wordlist = sentence.split()
+    words_to_keep = set(
+        generator.choice(
+            np.arange(len(wordlist)),
+            size=math.floor((1 - perturbation_pct) * len(wordlist)),
+            replace=False,
+        )
+    )
+
+    new_wordlist = [w for i, w in enumerate(wordlist) if (i in words_to_keep)]
+
+    return " ".join(new_wordlist)
+
+
+def desc_perturbation(
+    desc: str,
+    query_func: Callable,
+    num_perturbations: int = 10,
+    perturbation_pct: float = 0.1,
+    seed: Optional[float] = None,
+) -> Dict:
+    """Run many perturbations for a single original description. For confidence intervals on retrieval."""
+    generator = np.random.default_rng(seed)
+
+    all_perturbations_dict = {}
+    for i in trange(num_perturbations):
+        # Perturb desc:
+        new_desc = perturb_by_words(
+            desc, generator=generator, perturbation_pct=perturbation_pct
+        )
+        out_dict = query_func(new_desc)
+        all_perturbations_dict[f"perturb_{i}"] = out_dict
+
+    return all_perturbations_dict
