@@ -844,7 +844,9 @@ def create_input_retrieval(
 
 
 # for batch queries
-def merge_model_input_dicts(dict_list):
+def merge_model_input_dicts(
+    dict_list: List[Dict],
+) -> Dict:
     if len(dict_list) == 1:  # Trivial case of just wrapped model input
         return dict_list[0]
 
@@ -889,7 +891,7 @@ def create_batched_input_retrieval(
     instruction_source_relation: str = "all",
     aaseq_type: str = "protein",
     icl_example_number: int = 1,
-):
+) -> Dict:
 
     # First assertions:
     golden_len = len(input_descriptions)
@@ -979,7 +981,7 @@ def get_proteins_from_embedding(
 def get_proteins_from_batched_embeddings(
     protein_embeds: torch.Tensor,
     query_embeddings: Optional[torch.Tensor] = None,
-):
+) -> torch.Tensor:
     '''
     Inputs:
         top_k: int

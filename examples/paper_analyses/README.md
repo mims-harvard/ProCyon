@@ -20,9 +20,7 @@ This includes downloading datasets, model checkpoints, etc. as many notebooks an
 
 **Panel d**: Coming soon!
 
-**Panel e**: Coming soon!
-
-**Panel f**: Coming soon!
+**Panel e,f**: Please see [`composition_retrieval.ipynb`](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/composition_retrieval.ipynb).
 
 **Panel g**: Please see [`sting_retrieval.ipynb`](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/sting_retrieval.ipynb).
 
