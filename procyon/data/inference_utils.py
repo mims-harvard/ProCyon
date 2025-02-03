@@ -758,7 +758,12 @@ def create_input_retrieval(
     )
 
     # Get example text
-    example_descriptions = text_sequences.iloc[example_text_ids, 0].tolist()
+    example_descriptions = [
+        text_sequences.iloc[example_text_ids[i], :]
+        .loc[text_sequences.iloc[example_text_ids[i], :].notna()]
+        .tolist()[0]
+        for i in range(len(example_text_ids))
+    ]
 
     input_drug = None
     drug_inputs = None
@@ -872,7 +877,7 @@ def get_proteins_from_embedding(
             .detach()
             .clone()
         )
-    query_embeddings = F.normalize(query_embeddings, dim=-1).float()
+    query_embeddings = F.normalize(query_embeddings, dim=-1)
 
     # Now compute similarities to all proteins:
     sims = torch.matmul(
@@ -896,6 +901,7 @@ def get_proteins_from_embedding(
     df = pd.DataFrame({"uniprot_id": ids, "name": names, "sim_score": sim_sub})
 
     return df
+
 
 def perturb_by_words(
     sentence: str, generator: np.random.Generator, perturbation_pct: float = 0.1
