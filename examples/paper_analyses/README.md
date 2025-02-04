@@ -18,7 +18,7 @@ This includes downloading datasets, model checkpoints, etc. as many notebooks an
 
 **Panel c**: Coming soon!
 
-**Panel d**: Coming soon!
+**Panel d**: Please see [`embedding_comparison.ipynb`](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/embedding_comparison.ipynb).
 
 **Panel e,f**: Please see [`composition_retrieval.ipynb`](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/composition_retrieval.ipynb).
 
