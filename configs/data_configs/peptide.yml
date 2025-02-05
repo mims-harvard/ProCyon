@@ -1,0 +1,7 @@
+it_datasets:
+  train:
+    - aaseq_type: peptide
+      text_type: peptide
+      relations: [all]
+      tasks: [qa, retrieval] # CANNOT USE CAPTION HERE
+      splits: [all]
