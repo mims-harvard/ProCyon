@@ -20,6 +20,6 @@ ProCyon-Full training makes use of the config files:
 2. Data config: [`configs/data_configs/all_datasets_pretrain_full.yml`](https://github.com/mims-harvard/ProCyon/blob/main/configs/data_configs/all_datasets_pretrain_full.yml)
 3. Deepspeed config: [`configs/deepspeed/full_train_ds.json`](https://github.com/mims-harvard/ProCyon/blob/main/configs/deepspeed/full_train_ds.json)
 
-An example SLURM file for launching the training job on the Kempner Institute cluster is included at `examples/training/procyon_full_pretrain.sh`.
+An example SLURM file for launching the training job on the Kempner Institute cluster is included at `examples/training/procyon_pretrain_full.sh`.
 
 ## Fine-tuning for ProCyon-Bind
