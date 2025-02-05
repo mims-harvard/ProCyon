@@ -16,7 +16,7 @@ This includes downloading datasets, model checkpoints, etc. as many notebooks an
 
 **Panel b**: Please see [`protein_retrieval_multiple_sources.ipynb`](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/protein_retrieval_multiple_sources.ipynb).
 
-**Panel c**: Coming soon!
+**Panel c**: Due to copyrights of the DSM used for this analysis, we are not allowed to share this notebook publicly. Please reach out to us if you are interested in reproducing this analysis; contact info on main README.
 
 **Panel d**: Please see [`embedding_comparison.ipynb`](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/embedding_comparison.ipynb).
 
