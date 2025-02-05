@@ -20,6 +20,15 @@ ProCyon-Full training makes use of the config files:
 2. Data config: [`configs/data_configs/all_datasets_pretrain_full.yml`](https://github.com/mims-harvard/ProCyon/blob/main/configs/data_configs/all_datasets_pretrain_full.yml)
 3. Deepspeed config: [`configs/deepspeed/full_train_ds.json`](https://github.com/mims-harvard/ProCyon/blob/main/configs/deepspeed/full_train_ds.json)
 
-An example SLURM file for launching the training job on the Kempner Institute cluster is included at `examples/training/procyon_pretrain_full.sh`.
+An example SLURM file for launching the training job on the Kempner Institute cluster is included at [`examples/training/procyon_pretrain_full.sh`](https://github.com/mims-harvard/ProCyon/blob/main/examples/training/procyon_pretrain_full.sh).
+
+**Note**: We omit the configuration for rephrased descriptions in the config above due to issues in openly releasing generated rephrasings from proprietary LLMs. Please reach out to us if you're interested in using these rephrased descriptions.
 
 ## Fine-tuning for ProCyon-Bind
+
+ProCyon-Bind tuning makes use of the config files:
+1. Primary config: [`configs/peptide_tune.yml`](https://github.com/mims-harvard/ProCyon/blob/main/configs/peptide_tune.yml)
+2. Data config: [`configs/data_configs/peptide.yml`](https://github.com/mims-harvard/ProCyon/blob/main/configs/data_configs/peptide.yml)
+3. Deepspeed config: [`configs/deepspeed/ft_peptide.json`](https://github.com/mims-harvard/ProCyon/blob/main/configs/deepspeed/ft_peptide.json)
+
+An example SLURM file for launching the training job for ProCyon-Bind finetuning on the Kempner cluster is included at [`examples/training/procyon_peptide_tune.sh`](https://github.com/mims-harvard/ProCyon/blob/main/examples/training/procyon_peptide_tune.sh).
