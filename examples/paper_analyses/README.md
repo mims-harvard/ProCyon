@@ -6,6 +6,9 @@ All experiments are listed below; if a panel is not listed, that means that this
 Before attempting to reproduce, please follow all installation instructions [here](https://github.com/mims-harvard/ProCyon?tab=readme-ov-file#installation), and ensure the correct versions of each library are installed.
 This includes downloading datasets, model checkpoints, etc. as many notebooks and scripts make use of these resources, including files from the dataset available on [Huggingface](https://huggingface.co/datasets/mims-harvard/ProCyon-Instruct).
 
+## Training
+All details about training are found in [`ProCyon/examples/training`](https://github.com/mims-harvard/ProCyon/tree/main/examples/training).
+
 ## Figure 2
 
 **Panel f,g**: These results were generated using our evalaution framework. Please see the [README](https://github.com/mims-harvard/ProCyon/tree/main/procyon/evaluate) for more details on how to run it.
@@ -32,7 +35,10 @@ This includes downloading datasets, model checkpoints, etc. as many notebooks an
 
 **Panel a,b**: Please see [`ProCyon/examples/paper_analyses/drugdomain.ipynb`](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/drugdomain.ipynb).
 
-**Panel c**: Coming soon!
+**Panel c**: Reproducing this experiment requires a few steps:
+1. Download the ProCyon-Bind model, which has been finetuned for protein-peptide prediction. Training details for ProCyon-Bind are in [`examples/training`](https://github.com/mims-harvard/ProCyon/tree/main/examples/training), but it suffices to use the downloaded model weights for the experiment.
+2. [OPTIONAL] Once downloaded, you can run `scripts/protpep_qa_score.py` to generate the file `ace2_preds.pickle`, which contains the predictions for the QA formulation of the protein-peptide binding prediction problem. You can optionally use the provided file in `ProCyon-Instruct/experimental_data/ProteinPeptideBinding/ace2_preds.pickle`.
+3. All remaining information is in ...
 
 **Panel d**: Coming soon!
 
