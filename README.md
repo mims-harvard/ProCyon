@@ -90,8 +90,7 @@ or the [evaluation README](https://github.com/mims-harvard/ProCyon/blob/main/pro
 For details on how to reproduce the various experiments and results in our manuscript, please see
 the [reproducibility README](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/README.md).
 
-## Coming soon!
-- Full training documentation and tutorial
+For details on training a ProCyon model and example scripts, please see the [training README](https://github.com/mims-harvard/ProCyon/tree/main/examples/training/README.md).
 
 ## Citation
 ```
