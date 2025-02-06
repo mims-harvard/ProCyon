@@ -1,4 +1,4 @@
-#import esm
+import esm
 import torch
 import time
 from functools import partial
@@ -366,38 +366,38 @@ class ESM_PLM(torch.nn.Module):
             eos_idx = self.eos_idx,
             long_protein_strategy = self.long_protein_strategy,
             max_protein_len = self.max_protein_len)
-        extra_model_kwargs = {
-            'use_lora': use_lora,
-            'lora_alpha': lora_alpha,
-            'lora_r': lora_r,
-            'use_adapter': use_adapter,
-            'adapter_rank': adapter_rank
-        }
+        # extra_model_kwargs = {
+        #     'use_lora': use_lora,
+        #     'lora_alpha': lora_alpha,
+        #     'lora_r': lora_r,
+        #     'use_adapter': use_adapter,
+        #     'adapter_rank': adapter_rank
+        # }
         assert not ((pooling_method == 'cls_token') and (long_protein_strategy == 'split')), 'Cannot use CLS token with split strategy'
 
         if self.num_params == '8m':
-            # self.model, _ = esm.pretrained.esm2_t6_8M_UR50D()
-            self.model, _ = esm.pretrained.load_model_and_alphabet_local(pretrained_weights_dir+'/esm2_t6_8M_UR50D.pt')
+            self.model, _ = esm.pretrained.esm2_t6_8M_UR50D()
+            #self.model, _ = esm.pretrained.load_model_and_alphabet_local(pretrained_weights_dir+'/esm2_t6_8M_UR50D.pt')
             self.repr_layer = 6
             self.embedding_size = 320
         elif self.num_params == '35m':
-            # self.model, _ = esm.pretrained.esm2_t12_35M_UR50D()
-            self.model, _ = esm.pretrained.load_model_and_alphabet_local(pretrained_weights_dir+'/esm2_t12_35M_UR50D.pt')
+            self.model, _ = esm.pretrained.esm2_t12_35M_UR50D()
+            #self.model, _ = esm.pretrained.load_model_and_alphabet_local(pretrained_weights_dir+'/esm2_t12_35M_UR50D.pt')
             self.repr_layer = 12
             self.embedding_size = 480
         elif self.num_params == '650m':
-            self.model, _ = esm.pretrained.esm2_t33_650M_UR50D(**extra_model_kwargs)
+            self.model, _ = esm.pretrained.esm2_t33_650M_UR50D()
             # self.model, _ = esm.pretrained.load_model_and_alphabet_local(pretrained_weights_dir+'/esm2_t33_650M_UR50D.pt')
             self.repr_layer = 33
             self.embedding_size = 1280
         elif self.num_params == '3b':
-            self.model, _ = esm.pretrained.esm2_t36_3B_UR50D(**extra_model_kwargs)
+            self.model, _ = esm.pretrained.esm2_t36_3B_UR50D()
             # FIXME: This local loading is not working: https://github.com/facebookresearch/esm/discussions/514.  Investigate later.
             # self.model, _ = esm.pretrained.load_model_and_alphabet_local(pretrained_weights_dir+'/esm2_t36_3B_UR50D.pt')
             self.repr_layer = 36
             self.embedding_size = 2560
         elif self.num_params == '15b':
-            self.model, _ = esm.pretrained.esm2_t48_15B_UR50D(**extra_model_kwargs)
+            self.model, _ = esm.pretrained.esm2_t48_15B_UR50D()
             # self.model, _ = esm.pretrained.load_model_and_alphabet_local(pretrained_weights_dir+'/esm2_t48_15B_UR50D.pt')
             self.repr_layer = 48
             self.embedding_size = 5120
