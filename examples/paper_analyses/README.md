@@ -37,8 +37,8 @@ All details about training are found in [`ProCyon/examples/training`](https://gi
 
 **Panel c**: Reproducing this experiment requires a few steps:
 1. Download the ProCyon-Bind model, which has been finetuned for protein-peptide prediction. Training details for ProCyon-Bind are in [`examples/training`](https://github.com/mims-harvard/ProCyon/tree/main/examples/training), but it suffices to use the downloaded model weights for the experiment.
-2. [OPTIONAL] Once downloaded, you can run `scripts/protpep_qa_score.py` to generate the file `ace2_preds.pickle`, which contains the predictions for the QA formulation of the protein-peptide binding prediction problem. You can optionally use the provided file in `ProCyon-Instruct/experimental_data/ProteinPeptideBinding/ace2_preds.pickle`.
-3. All remaining information is in ...
+2. [OPTIONAL] Once downloaded, you can run [`protpep_qa_score.py`](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/protpep_qa_scores.py) to generate the file `ace2_preds.pickle`, which contains the predictions for the QA formulation of the protein-peptide binding prediction problem. You can optionally use the provided file in `ProCyon-Instruct/experimental_data/ProteinPeptideBinding/ace2_preds.pickle`.
+3. All remaining information and analyses is in [prot_pep.pynb](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/prot_pep.ipynb).
 
 **Panel d**: Coming soon!
 
