@@ -13,6 +13,7 @@ Our associated HuggingFace collection containing model weights and datasets can 
 ## Installation
 Requirements:
 - CUDA toolkit, particularly `nvcc`
+- Sign up for Huggingface permissions for LLaMA-3 at [this link](https://huggingface.co/meta-llama/Meta-Llama-3-8B). You'll need this to use ProCyon-Full and ProCyon-Bind.
 
 We recommend installing with [uv](https://docs.astral.sh/uv/), but install can also be done via `pip` alone. The `procyon` package used to interact with pre-trained models or train new models can be installed via
 ```
