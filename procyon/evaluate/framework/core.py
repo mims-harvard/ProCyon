@@ -207,12 +207,13 @@ def run_evaluation(
         eval_func = task_evals[task]
 
         for model_name, args in models.items():
-            if model_name.lower() == "protst":
+            model_type = args["model_type"]
+            if model_type.lower() == "protst":
                 assert (
                     sys.version_info[1] <= 10
                 ), "ProtST not compatible with Python >3.10, please change version"
 
-            model = model_zoo[task][model_name](args, eval_args, model_args, device)
+            model = model_zoo[task][model_type](args, eval_args, model_args, device)
 
             model_results_dir = os.path.join(eval_args.output_dir, task, model_name)
 

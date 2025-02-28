@@ -69,6 +69,7 @@ def calc_bootstrap_bounds(
     statistic: Callable = np.mean,
     seed: int = 42,
     paired: bool = False,
+    ignore_cols: List[str] = [],
 ) -> Dict:
     if not paired:
         for k, v in metric_samples.items():
@@ -77,6 +78,8 @@ def calc_bootstrap_bounds(
     rng = np.random.default_rng(seed=seed)
     bounds = {}
     for metric_name, samples in metric_samples.items():
+        if metric_name in ignore_cols:
+            continue
         if paired:
             x, y = zip(*samples)
             inputs = (x, y)
@@ -252,7 +255,10 @@ def load_and_validate_model_args(
         assert isinstance(
             this_model_args, dict
         ), f"expected dict, got {type(this_model_args)}"
-        model_args[model_specs["model_name"]] = this_model_args
+        model_key = this_model_args.get("model_key", model_specs["model_name"])
+        this_model_args["model_type"] = model_specs["model_name"]
+
+        model_args[model_key] = this_model_args
     return model_args
 
 

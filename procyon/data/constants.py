@@ -703,6 +703,7 @@ CANONICAL_SPLITS = {
     "go": "sample_aware_ontology_go_centric",
     "gtop": "random_gtop_centric",
     "omim": "disgenet_aligned_improved_omim_centric",
+    "pfam": "clan_aware_pfam_centric",
     "reactome": "random_reactome_centric",
     "uniprot": "random_uniprot_centric",
 }
