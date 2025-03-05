@@ -11,6 +11,12 @@ body {
   margin-bottom: 2rem;
 }
 
+.content p, .subtitle {
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
 .content-container {
   display: flex;
   flex-direction: column;
