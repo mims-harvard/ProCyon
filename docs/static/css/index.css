@@ -163,4 +163,54 @@ body {
 }
 
 
+/* Base font sizes */
+body {
+  font-size: 16px;
+}
+
+/* Responsive font sizes for mobile devices */
+@media screen and (max-width: 768px) {
+  body {
+      font-size: 14px;
+  }
+
+  .title {
+      font-size: 1.5rem !important;
+  }
+
+  .subtitle {
+      font-size: 1rem !important;
+  }
+
+  .publication-authors {
+      font-size: 0.9rem !important;
+  }
+
+  .content p {
+      font-size: 0.95rem;
+  }
+}
+
+/* Even smaller screens */
+@media screen and (max-width: 480px) {
+  body {
+      font-size: 12px;
+  }
+
+  .title {
+      font-size: 1.3rem !important;
+  }
+
+  .subtitle {
+      font-size: 0.9rem !important;
+  }
+
+  .publication-authors {
+      font-size: 0.8rem !important;
+  }
+
+  .content p {
+      font-size: 0.9rem;
+  }
+}
 
