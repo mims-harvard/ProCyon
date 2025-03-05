@@ -2,6 +2,29 @@ body {
   font-family: 'Noto Sans', sans-serif;
 }
 
+.responsive-image {
+  width: 100%;
+  max-width: 1200px;  /* Set a reasonable max-width */
+  height: auto;
+  display: block;
+  margin: 0 auto;  /* Center the image */
+  margin-bottom: 2rem;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px;  /* Adjust as needed */
+  margin: 0 auto;
+  padding: 0 15px;  /* Add some padding */
+}
+
+.content-text {
+  max-width: 90%;
+  margin: 0 auto;
+  text-align: left;
+}
 
 .footer .icon-link {
     font-size: 25px;
@@ -129,7 +152,7 @@ body {
   background: #000000;
 }
 
-.eql-cntrb { 
+.eql-cntrb {
   font-size: smaller;
 }
 
