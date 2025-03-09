@@ -511,11 +511,18 @@ def run_retrieval_eval(
         targets,
         filter_training=eval_args.filter_training_pairs,
     )
+
     preds_path = os.path.join(output_dir, "predictions.pkl")
+    row_idx_path = os.path.join(output_dir, "row_idxs.tsv")
+    col_idx_path = os.path.join(output_dir, "col_idxs.tsv")
     if os.path.exists(preds_path) and eval_args.use_cached_results:
         print(f"retrival: {model_name}: {dataset_key} loading cached predictions")
         with open(preds_path, "rb") as fh:
             predictions = torch.load(fh)
+        saved_query_order = pd.read_table(row_idx_path, names=["idx"]).idx.to_list()
+        saved_target_order = pd.read_table(col_idx_path, names=["idx"]).idx.to_list()
+        assert saved_query_order == query_order
+        assert saved_target_order == target_order
     else:
         predictions = model.get_predictions(
             data_loader,
@@ -525,6 +532,11 @@ def run_retrieval_eval(
         )
         with open(preds_path, "wb") as fh:
             torch.save(predictions, fh)
+        with open(row_idx_path, "w") as fh:
+            pd.Series(query_order).to_csv(fh, index=False, sep="\t", header=False)
+        with open(col_idx_path, "w") as fh:
+            pd.Series(target_order).to_csv(fh, index=False, sep="\t", header=False)
+
     metrics = calc_retrieval_metrics(
         predictions,
         labels,
