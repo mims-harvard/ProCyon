@@ -3,10 +3,10 @@ from typing import Dict, Optional, Tuple, Union
 from pathlib import Path
 
 import argparse
-from loguru import logger
 import pandas as pd
 
 from procyon.inference.retrieval_utils import startup_retrieval, do_retrieval
+from procyon.inference.settings import logger
 
 CKPT_NAME = os.path.expanduser(os.getenv("CHECKPOINT_PATH"))
 

@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 from huggingface_hub import login as hf_login
-from loguru import logger
 import pandas as pd
 from typing import Optional, Tuple
 import torch
@@ -12,6 +11,7 @@ from procyon.data.inference_utils import (
     get_proteins_from_embedding,
 )
 from procyon.evaluate.framework.utils import move_inputs_to_device
+from procyon.inference.settings import logger
 from procyon.model.model_unified import UnifiedProCyon
 from procyon.training.train_utils import DataArgs
 
@@ -40,32 +40,32 @@ def startup_retrieval(
     """
     logger.info("Now running startup functions for protein retrieval")
 
-    logger.info("Now logging into huggingface hub")
+    logger.debug("Now logging into huggingface hub")
     hf_login(token=os.getenv("HF_TOKEN"))
-    logger.info("Done logging into huggingface hub")
+    logger.debug("Done logging into huggingface hub")
 
     if inference_bool:
-        logger.info("Inference is enabled.")
+        logger.debug("Inference is enabled.")
 
         # load the pre-trained ProCyon model
         model, device, data_args = load_model_onto_device()
     else:
-        logger.info("Inference is disabled.")
+        logger.debug("Inference is disabled.")
         # loading the model requires time and memory, so we skip it if we are only testing the CLI
         model = None
         device = None
         data_args = None
 
     # Load the pre-calculated protein target embeddings
-    logger.info("Now loading protein target embeddings")
+    logger.debug("Now loading protein target embeddings")
     all_protein_embeddings, all_protein_ids = torch.load(
         os.path.join(CKPT_NAME, "protein_target_embeddings.pkl")
     )
     all_protein_embeddings = all_protein_embeddings.float()
-    logger.info(
+    logger.debug(
         f"shape of precalculated embeddings matrix: {all_protein_embeddings.shape}"
     )
-    logger.info("Done loading protein target embeddings")
+    logger.debug("Done loading protein target embeddings")
     logger.info("Done running startup functions for protein retrieval")
 
     return model, device, data_args, all_protein_embeddings
@@ -84,22 +84,22 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
     # Replace with the path where you downloaded a pre-trained ProCyon model (e.g. ProCyon-Full)
     data_args = torch.load(os.path.join(CKPT_NAME, "data_args.pt"))
     model, _ = UnifiedProCyon.from_pretrained(checkpoint_dir=CKPT_NAME)
-    logger.info("Done loading pretrained model")
+    logger.debug("Done loading pretrained model")
 
-    logger.info("Now quantizing the model to a smaller precision")
+    logger.debug("Now quantizing the model to a smaller precision")
     model.bfloat16()  # Quantize the model to a smaller precision
-    logger.info("Done quantizing the model to a smaller precision")
+    logger.debug("Done quantizing the model to a smaller precision")
 
-    logger.info("Now setting the model to evaluation mode")
+    logger.debug("Now setting the model to evaluation mode")
     model.eval()
-    logger.info("Done setting the model to evaluation mode")
+    logger.debug("Done setting the model to evaluation mode")
 
-    logger.info("Now applying pretrained model to device")
-    logger.info(f"Total memory allocated by PyTorch: {torch.cuda.memory_allocated()}")
+    logger.debug("Now applying pretrained model to device")
+    logger.debug(f"Total memory allocated by PyTorch: {torch.cuda.memory_allocated()}")
     # identify available devices on the machine
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
-    logger.info(f"Total memory allocated by PyTorch: {torch.cuda.memory_allocated()}")
+    logger.debug(f"Total memory allocated by PyTorch: {torch.cuda.memory_allocated()}")
 
     logger.info("Done loading model and applying it to compute device")
 
@@ -141,7 +141,7 @@ def do_retrieval(
             'instruction_source_dataset must be either "disgenet" or "omim"'
         )
 
-    logger.info("entering task description and prompt")
+    logger.debug("entering task description and prompt")
     if task_desc_infile is not None:
         if task_desc is not None:
             raise ValueError(
@@ -166,10 +166,10 @@ def do_retrieval(
 
     task_desc = task_desc.replace("\n", " ")
     disease_desc = disease_desc.replace("\n", " ")
-    logger.info("Done entering task description and prompt")
+    logger.debug("Done entering task description and prompt")
 
     if inference_bool:
-        logger.info("Now performing protein retrieval")
+        logger.debug("Now performing the protein retrieval inference step.")
 
         # Create input for retrieval
         input_simple = create_input_retrieval(
@@ -193,6 +193,8 @@ def do_retrieval(
         df_dep = get_proteins_from_embedding(
             all_protein_embeddings, model_out, top_k=None
         )
+
+        logger.debug("Done performing the protein retrieval inference step.")
 
         logger.info("Done performing protein retrieval")
 
