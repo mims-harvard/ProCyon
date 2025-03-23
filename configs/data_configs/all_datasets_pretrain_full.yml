@@ -1,0 +1,84 @@
+it_datasets:
+  train:
+    # GO:
+    - aaseq_type: protein
+      text_type: go
+      relations: [process, function, component]
+      tasks: [qa, caption, retrieval]
+      splits: [all]
+      split_method: sample_aware_ontology_go_centric
+    # DrugBank MoA:
+    - aaseq_type: protein
+      text_type: drugbank:moa
+      relations: [drug_target, drug_enzyme, drug_carrier, drug_transporter]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: atc_aware_drugbank_centric
+    # DrugBank indication:
+    - aaseq_type: protein
+      text_type: drugbank:indication
+      relations: [drug_target, drug_enzyme, drug_carrier, drug_transporter]
+      tasks: [caption]
+      splits: [all]
+      split_method: atc_aware_drugbank_centric
+    # DisGeNET:
+    - aaseq_type: protein
+      text_type: disgenet
+      relations: [all]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: area_protein_aware_disgenet_centric
+    # STRING:
+    - aaseq_type: protein
+      text_type: protein
+      relations: [homology, coexpression, experiments]
+      tasks: [qa, retrieval] # CANNOT USE CAPTION HERE
+      splits: [all]
+    # Domain-Pfam
+    - aaseq_type: domain
+      text_type: pfam
+      relations: [all]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: clan_aware_pfam_centric
+    # Domain-GO
+    - aaseq_type: domain
+      text_type: go
+      relations: [process, function, component]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: sample_aware_ontology_go_centric
+    # Reactome
+    - aaseq_type: protein
+      text_type: reactome
+      relations: [all]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: random_reactome_centric
+    # Guide to Pharmacology (GtoP)
+    - aaseq_type: protein
+      text_type: gtop
+      relations: [all]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: random_gtop_centric
+    # OMIM - holdout for now for evaluations
+    - aaseq_type: protein
+      text_type: omim
+      relations: [all]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: disgenet_aligned_improved_omim_centric
+    # UniProt
+    - aaseq_type: protein
+      text_type: uniprot
+      relations: [all]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: random_uniprot_centric # Not actually split
+    - aaseq_type: protein
+      text_type: ec
+      relations: [all]
+      tasks: [qa, retrieval, caption]
+      splits: [all]
+      split_method: hierarchy_aware_ec_centric

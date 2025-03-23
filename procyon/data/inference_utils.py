@@ -1,15 +1,20 @@
 import json
+import math
 import os
 
+from collections.abc import Callable
 from typing import (
     Dict,
     List,
     Optional,
 )
 
+import pandas as pd
+import numpy as np
 import torch
 import torch.nn.functional as F
-import pandas as pd
+
+from tqdm import trange
 
 from procyon.data.constants import (
     CAPTION_SUBSETS,
@@ -753,7 +758,12 @@ def create_input_retrieval(
     )
 
     # Get example text
-    example_descriptions = text_sequences.iloc[example_text_ids, 0].tolist()
+    example_descriptions = [
+        text_sequences.iloc[example_text_ids[i], :]
+        .loc[text_sequences.iloc[example_text_ids[i], :].notna()]
+        .tolist()[0]
+        for i in range(len(example_text_ids))
+    ]
 
     input_drug = None
     drug_inputs = None
@@ -833,6 +843,81 @@ def create_input_retrieval(
     return model_input
 
 
+# for batch queries
+def merge_model_input_dicts(
+    dict_list: List[Dict],
+) -> Dict:
+    if len(dict_list) == 1:  # Trivial case of just wrapped model input
+        return dict_list[0]
+
+    mega_dict = dict_list[0]
+    mega_dict["input"]["seq"] = mega_dict["input"]["seq"]
+    mega_dict["input"]["text"] = mega_dict["input"]["text"]
+
+    for d in dict_list[1:]:
+
+        for k in d["data"].keys():  # Data just concatenates
+            if d["data"][k] is None:
+                continue
+            elif isinstance(d["data"][k], list):
+                mega_dict["data"][k] = mega_dict["data"][k] + d["data"][k]
+            else:
+                mega_dict["data"][k] = torch.cat([mega_dict["data"][k], d["data"][k]])
+
+        for k in d["input"].keys():
+            if d["input"][k] is None:
+                continue
+            else:
+                # Put it at THE END
+                updated_L = [
+                    [
+                        (val + np.max(mega_dict["input"][k]).item() + 1)
+                        for val in d["input"][k][0]
+                    ]
+                ]
+                mega_dict["input"][k] += updated_L
+
+        # Easy single list merge:
+        mega_dict["instructions"] += d["instructions"]
+
+    return mega_dict
+
+
+def create_batched_input_retrieval(
+    input_descriptions: List[str],
+    data_args: DataArgs,
+    task_definitions: List[str] = None,
+    instruction_source_dataset: str = None,
+    instruction_source_relation: str = "all",
+    aaseq_type: str = "protein",
+    icl_example_number: int = 1,
+) -> Dict:
+
+    # First assertions:
+    golden_len = len(input_descriptions)
+
+    if task_definitions is not None:
+        assert len(task_definitions) == golden_len
+    else:
+        task_definitions = [None] * golden_len
+
+    dict_list = []
+    for i in range(golden_len):
+        model_input = create_input_retrieval(
+            input_description=input_descriptions[i],
+            data_args=data_args,
+            task_definition=task_definitions[i],
+            instruction_source_dataset=instruction_source_dataset,
+            instruction_source_relation=instruction_source_relation,
+            aaseq_type=aaseq_type,
+            icl_example_number=icl_example_number,
+        )
+        dict_list.append(model_input)
+
+    batched_dict = merge_model_input_dicts(dict_list)
+
+    return batched_dict
+
 def get_proteins_from_embedding(
     protein_embeds: torch.Tensor,
     model_out: Optional[Dict] = None,
@@ -867,7 +952,7 @@ def get_proteins_from_embedding(
             .detach()
             .clone()
         )
-    query_embeddings = F.normalize(query_embeddings, dim=-1).float()
+    query_embeddings = F.normalize(query_embeddings, dim=-1)
 
     # Now compute similarities to all proteins:
     sims = torch.matmul(
@@ -891,3 +976,63 @@ def get_proteins_from_embedding(
     df = pd.DataFrame({"uniprot_id": ids, "name": names, "sim_score": sim_sub})
 
     return df
+
+@torch.no_grad()
+def get_proteins_from_batched_embeddings(
+    protein_embeds: torch.Tensor,
+    query_embeddings: Optional[torch.Tensor] = None,
+) -> torch.Tensor:
+    '''
+    Inputs:
+        top_k: int
+            - Number of top proteins to retrieve for the scoring
+            - Set this to None if you want the whole dataframe
+    '''
+    # Get embedding:
+    assert query_embeddings is not None
+    query_embedding = F.normalize(query_embeddings, dim=-1).float()
+
+    # Now compute similarities to all proteins:
+    # all_protein_embeddings might already be normalized, but in this case, normalize() is an identity function
+    sims = torch.matmul(query_embedding.cuda(), F.normalize(protein_embeds, dim=-1).transpose(0,1).cuda()).squeeze()
+
+    return sims.detach().clone().cpu().float()
+
+def perturb_by_words(
+    sentence: str, generator: np.random.Generator, perturbation_pct: float = 0.1
+) -> str:
+    """Generate perturbed description."""
+    wordlist = sentence.split()
+    words_to_keep = set(
+        generator.choice(
+            np.arange(len(wordlist)),
+            size=math.floor((1 - perturbation_pct) * len(wordlist)),
+            replace=False,
+        )
+    )
+
+    new_wordlist = [w for i, w in enumerate(wordlist) if (i in words_to_keep)]
+
+    return " ".join(new_wordlist)
+
+
+def desc_perturbation(
+    desc: str,
+    query_func: Callable,
+    num_perturbations: int = 10,
+    perturbation_pct: float = 0.1,
+    seed: Optional[float] = None,
+) -> Dict:
+    """Run many perturbations for a single original description. For confidence intervals on retrieval."""
+    generator = np.random.default_rng(seed)
+
+    all_perturbations_dict = {}
+    for i in trange(num_perturbations):
+        # Perturb desc:
+        new_desc = perturb_by_words(
+            desc, generator=generator, perturbation_pct=perturbation_pct
+        )
+        out_dict = query_func(new_desc)
+        all_perturbations_dict[f"perturb_{i}"] = out_dict
+
+    return all_perturbations_dict

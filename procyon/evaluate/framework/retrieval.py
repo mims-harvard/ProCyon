@@ -297,6 +297,7 @@ def calc_retrieval_metrics_single(
     preds_mat: torch.Tensor,
     labels_mat: torch.Tensor,
     eval_args: EvalArgs,
+    query_ids: List[int],
     output_dir: str,
 ) -> Tuple[Dict, Dict]:
     """Calculate retrieval metrics for a single set of predictions and labels."""
@@ -337,6 +338,7 @@ def calc_retrieval_metrics_single(
 
     samples_dict["auroc"] = per_query_aurocs
     samples_dict["auprc"] = per_query_auprcs
+    samples_dict["query_id"] = query_ids
 
     return metrics, samples_dict
 
@@ -345,6 +347,7 @@ def calc_retrieval_metrics_class_balanced(
     preds_mat: torch.Tensor,
     labels_mat: torch.Tensor,
     eval_args: EvalArgs,
+    query_ids: List[int],
     output_dir: str,
 ) -> Dict:
     """Calculate retrievel metrics as an average over class-balanced samples."""
@@ -362,6 +365,7 @@ def calc_retrieval_metrics_class_balanced(
 
         no_pos_labels = []
         all_nan_preds = []
+        used_queries = []
         num_queries_evaluated = 0
         for i in range(num_queries):
             # If full row of predictions is NaN, want to skip, this can happen if
@@ -374,7 +378,7 @@ def calc_retrieval_metrics_class_balanced(
             # is a trivial/uninteresting prediction task. This can happen for multiple reasons
             # but one observed reason is relations existing in both a train and eval split,
             # resulting in the relations being filtered by filter_train_relations
-            if labels_mat[i].nansum() == 0:
+            if labels_mat[i].nansum().item() == 0:
                 no_pos_labels.append(i)
                 continue
             pos_idxs = torch.argwhere(labels_mat[i] == 1).squeeze(-1)
@@ -402,6 +406,7 @@ def calc_retrieval_metrics_class_balanced(
             )
             all_preds.append(preds_mat[i, want_idxs])
             all_labels.append(labels_mat[i, want_idxs])
+            used_queries.append(query_ids[i])
             num_queries_evaluated += 1
 
         if sample_num == 0 and len(no_pos_labels) != 0:
@@ -430,8 +435,11 @@ def calc_retrieval_metrics_class_balanced(
             sampled_preds,
             sampled_labels,
             eval_args,
+            used_queries,
             out_dir,
         )
+        samples["sample_num"] = [sample_num for _ in used_queries]
+
         sum_dicts(all_metrics, avg_metrics)
         sum_dicts(all_samples, samples)
 
@@ -446,6 +454,7 @@ def calc_retrieval_metrics(
     preds_mat: torch.Tensor,
     labels_mat: torch.Tensor,
     eval_args: EvalArgs,
+    query_ids: List[int],
     output_dir: str,
 ) -> Dict:
     """Calculate retrieval metrics for a full set of results, dispatching to appropriate methods."""
@@ -454,6 +463,7 @@ def calc_retrieval_metrics(
             preds_mat,
             labels_mat,
             eval_args,
+            query_ids,
             output_dir,
         )
     else:
@@ -461,9 +471,16 @@ def calc_retrieval_metrics(
             preds_mat,
             labels_mat,
             eval_args,
+            query_ids,
             output_dir,
         )
-    raw_metrics.update(calc_bootstrap_bounds(samples))
+    raw_metrics.update(calc_bootstrap_bounds(
+        samples,
+        ignore_cols=["query_id", "sample_num"]
+    ))
+    with open(os.path.join(output_dir, "per_text_metrics.tsv"), "w") as fh:
+        pd.DataFrame(samples).to_csv(fh, index=False, sep="\t")
+
     return raw_metrics
 
 
@@ -512,6 +529,7 @@ def run_retrieval_eval(
         predictions,
         labels,
         eval_args,
+        query_order,
         output_dir,
     )
 

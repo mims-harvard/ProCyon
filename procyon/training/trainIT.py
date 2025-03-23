@@ -91,7 +91,7 @@ def set_text_lora_group(model: nn.Module, index):
         if hasattr(m, 'set_text_lora_group'):
             m.set_text_lora_group(index)
 
-class TxPLMTrainerIT(Trainer):
+class ProCyonTrainer(Trainer):
     """
     Trainer adapted from OntoProtein. Referenced transformers.Trainer and DRAGON.
     Notes:

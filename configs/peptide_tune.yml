@@ -1,0 +1,138 @@
+# --------------------------------------   DATA ARGUMENTS   --------------------------------------
+# Splitting:
+go_split_method: "sample_aware_ontology_go_centric"
+val_split_type: "pt_ft"
+
+# Entity description options:
+use_entity_compositions: True
+sample_entity_compositions: "uniform"
+
+# Instruction example numbers:
+num_instruction_examples: 1
+sample_num_instruction_examples: False
+
+# Negative sampling:
+num_neg_samples_qa: 1 
+negative_sampling_strategy_qa: "aaseq_only"
+negative_sampling_strategy_retrieval: "in_batch"
+
+# Which methods to train on:
+use_protein_mlm: False
+use_qa: True
+use_retrieval: True
+use_caption: False
+
+# Config of datasets:
+it_data_config_yml: configs/data_configs/peptide.yml
+
+ppi_store_reverse_edges: True
+
+protein_sims_type: "esm2-3b_embeds_cosine"
+
+# --------------------------------------  MODEL ARGUMENTS   --------------------------------------
+protein_encoder_num_params: "3b"
+use_aaseq_embeddings: True
+freeze_aaseq_embeddings: True
+protein_pooling_opt: "mean"
+protein_seq_embeddings_path: "DATA_DIR/generated_data/node_embeddings/protein/protein_esm2-3b_mean.pt"
+domain_embeddings_path: "DATA_DIR/generated_data/node_embeddings/domain/domain_esm2-3b_mean.pt"
+peptide_embeddings_path: "DATA_DIR/generated_data/node_embeddings/peptide/peptide_esm3b-mean.pt"
+peptide_embeddings_idmap_path: "DATA_DIR/generated_data/node_embeddings/peptide/peptide_embeds_idmap.pkl"
+
+# Protein encoder LoRA configs:
+freeze_protein_encoder: "all"
+
+# Text encoder:
+use_text_embeddings: False
+freeze_text_embeddings: False
+text_encoder_fname: "llama-3-8b"
+max_text_len: 2048
+freeze_text_encoder: "all"
+
+# Architecture specific to FROMAGe:
+num_layers_token_projector: 3
+hidden_size_token_projector: 2560
+num_layers_shared_projector: 3
+hidden_size_shared_projector: 2560
+num_layers_lm_projector: 3
+hidden_size_lm_projector: 2560
+
+# Modeling-specific:
+ret_token_access: "last"
+train_qa_full_lm: False
+train_retrieval_lm: False
+roll_num: 0
+
+context_crop_sampling: False
+
+# SUBSET VERSIONS
+qa_subset_version: 5
+retrieval_subset_version: 5
+caption_subset_version: 5 # Subsetting captions
+
+# Protein structure, etc.
+use_protein_struct: False
+use_drug_embeddings: True
+protein_struct_dropout: 0.0 # NONE BECAUSE MODEL STILL LEARNS
+
+contrastive_global: True
+
+# Disease context augmentation
+insert_disease_function_context: True
+
+# Filtering + shuffling parameters CRITICAL:
+filter_negatives_by_id_contrastive: True
+shuffle_seed_metadataset: 12345
+
+# -------------------------------------- TRAINING ARGUMENTS --------------------------------------
+# Contrastive learning
+cl_method: "infonce"
+use_projection_cl: False
+
+# Training length:
+max_steps: -1
+num_train_epochs: 20
+save_steps: 100
+eval_on_the_fly: False
+eval_steps: 500
+
+# Weights and Biases information:
+run_name: "procyon_peptide3"
+group_name: "procyon_peptide3"
+base_name: "procyon_peptide3"
+watch_gradient: True
+distributed_wandb_logging: True
+gradient_log_frequency: 100
+output_dir: "/path/to/your/SAVEDIR"
+
+# Batch sizes:
+protein_mlm_batch_size: 2
+qa_batch_size: 4
+retrieval_batch_size: 8
+caption_batch_size: 8
+
+# Loss weighting:
+mlm_loss_weight: 0.5
+qa_loss_weight: 1.0 # It ends up being less relative to caption_loss
+retrieval_loss_weight: 1.0
+caption_loss_weight: 1.0
+
+# Epoch scaling:
+qa_epoch_multiplier: 1
+retrieval_epoch_multiplier: 1
+caption_epoch_multiplier: 1
+
+# -------------------------------- DEEPSPEED ARGS ---------------------------------------
+use_deepspeed: True
+deepspeed_config: "configs/deepspeed/ft_peptide.json"
+model_splitting: False
+n_model_pieces: 1
+
+# -------------------------------- RESUME ARGS ---------------------------------------
+# Will be used to resume later
+resume_from_checkpoint: "MODEL_STORAGE_PATH/txplm-full/"
+resume_model_args: False
+resume_train_args: False
+resume_data_args: False
+resume_training_progress: False
+force_checkpoint_load_consolidation: True

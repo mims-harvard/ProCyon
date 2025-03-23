@@ -13,6 +13,7 @@ Our associated HuggingFace collection containing model weights and datasets can 
 ## Installation
 Requirements:
 - CUDA toolkit, particularly `nvcc`
+- Sign up for Huggingface permissions for LLaMA-3 at [this link](https://huggingface.co/meta-llama/Meta-Llama-3-8B). You'll need this to use ProCyon-Full and ProCyon-Bind.
 
 We recommend installing with [uv](https://docs.astral.sh/uv/), but install can also be done via `pip` alone. The `procyon` package used to interact with pre-trained models or train new models can be installed via
 ```
@@ -43,7 +44,7 @@ Installation with `uv` should take less than 10 minutes, depending on the
 speed of your internet connection for downloading packages.
 
 In addition to the package code, ProCyon also requires pre-trained weights for associated
-models (e.g. Llama-3, ESM2) as well as access to the ProCyon-Instruct dataset. 
+models (e.g. Llama-3, ESM2) as well as access to the ProCyon-Instruct dataset.
 You'll need to request access to the LLaMA-3 model through the model page [here](https://huggingface.co/meta-llama/Meta-Llama-3-8B).
 These dependencies
 will all be stored in a single directory, which we denote `DATA_DIR`.
@@ -87,10 +88,10 @@ various other baselines and models, please see the
 [example configs and scripts](https://github.com/mims-harvard/ProCyon/blob/main/examples/evaluation)
 or the [evaluation README](https://github.com/mims-harvard/ProCyon/blob/main/procyon/evaluate/README.md).
 
-## Coming soon!
-- Additional notebooks with analysis examples
-- Reproduction code from the manuscript
-- Full training documentation and tutorial
+For details on how to reproduce the various experiments and results in our manuscript, please see
+the [reproducibility README](https://github.com/mims-harvard/ProCyon/blob/main/examples/paper_analyses/README.md).
+
+For details on training a ProCyon model and example scripts, please see the [training README](https://github.com/mims-harvard/ProCyon/tree/main/examples/training/README.md).
 
 ## Citation
 ```
