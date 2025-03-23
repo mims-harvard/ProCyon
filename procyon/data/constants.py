@@ -695,3 +695,15 @@ CAPTION_TRAIN_WEIGHTS = {
         "protein_uniprot": 2.0,
     }
 }
+
+CANONICAL_SPLITS = {
+    "disgenet": "area_protein_aware_disgenet_centric",
+    "drugbank": "atc_aware_drugbank_centric",
+    "ec": "hierarchy_aware_ec_centric",
+    "go": "sample_aware_ontology_go_centric",
+    "gtop": "random_gtop_centric",
+    "omim": "disgenet_aligned_improved_omim_centric",
+    "pfam": "clan_aware_pfam_centric",
+    "reactome": "random_reactome_centric",
+    "uniprot": "random_uniprot_centric",
+}

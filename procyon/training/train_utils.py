@@ -120,71 +120,6 @@ def get_datasets(data_args: DataArgs, task_type="qa") -> Tuple[Dataset]:
             use_only_goa_gos=data_args.use_only_goa_gos,
             training=False,
         )
-    # TODO: Mask back in if we need it
-    # if data_args.use_protein_protein_cl:
-    #     train_protein_protein_dataset = ProteinProteinDataset(
-    #         data_dir=data_args.data_dir,
-    #         use_only_ppi_proteins=data_args.use_only_ppi_proteins,
-    #         training=True
-    #     )
-    #     val_protein_protein_dataset = ProteinProteinDataset(
-    #         data_dir=data_args.data_dir,
-    #         use_only_ppi_proteins=data_args.use_only_ppi_proteins,
-    #         training=False
-    #     )
-
-    # if data_args.use_domain_go_dataset:
-    #     train_domain_go_dataset = DomainGODataset(
-    #         data_dir=data_args.data_dir,
-    #         go_split_method=data_args.go_split_method,
-    #         negative_sampling_strategy=data_args.negative_sampling_strategy_domain_go,
-    #         domain_sims_type=data_args.domain_sims_type,
-    #         go_sims_type=data_args.go_sims_type,
-    #         num_neg_samples_domain_go_per_domain=data_args.num_neg_samples_domain_go_per_domain,
-    #         num_neg_samples_domain_go_per_go=data_args.num_neg_samples_domain_go_per_go,
-    #         use_only_domain_go_domains=data_args.use_only_domain_go_domains,
-    #         use_only_domain_go_gos=data_args.use_only_domain_go_gos,
-    #         training=True
-    #     )
-    #     val_domain_go_dataset = DomainGODataset(
-    #         data_dir=data_args.data_dir,
-    #         go_split_method=data_args.go_split_method,
-    #         negative_sampling_strategy=data_args.negative_sampling_strategy_domain_go,
-    #         domain_sims_type=data_args.domain_sims_type,
-    #         go_sims_type=data_args.go_sims_type,
-    #         num_neg_samples_domain_go_per_domain=data_args.num_neg_samples_domain_go_per_domain,
-    #         num_neg_samples_domain_go_per_go=data_args.num_neg_samples_domain_go_per_go,
-    #         use_only_domain_go_domains=data_args.use_only_domain_go_domains,
-    #         use_only_domain_go_gos=data_args.use_only_domain_go_gos,
-    #         training=False
-    #     )
-    # if data_args.use_pfam_dataset:
-    #     train_domain_pfam_dataset = DomainPfamDataset(
-    #         data_dir=data_args.data_dir,
-    #         pfam_split_method=data_args.pfam_split_method,
-    #         negative_sampling_strategy=data_args.negative_sampling_strategy_domain_pfam,
-    #         domain_sims_type=data_args.domain_sims_type,
-    #         pfam_sims_type=data_args.pfam_sims_type,
-    #         num_neg_samples_domain_pfam_per_domain=data_args.num_neg_samples_domain_pfam_per_domain,
-    #         num_neg_samples_domain_pfam_per_pfam=data_args.num_neg_samples_domain_pfam_per_pfam,
-    #         use_only_domain_pfam_domains=data_args.use_only_domain_pfam_domains,
-    #         use_only_domain_pfam_pfams=data_args.use_only_domain_pfam_pfams,
-    #         training=True
-    #     )
-    #     val_domain_pfam_dataset = DomainPfamDataset(
-    #         data_dir=data_args.data_dir,
-    #         pfam_split_method=data_args.pfam_split_method,
-    #         negative_sampling_strategy=data_args.negative_sampling_strategy_domain_pfam,
-    #         domain_sims_type=data_args.domain_sims_type,
-    #         pfam_sims_type=data_args.pfam_sims_type,
-    #         num_neg_samples_domain_pfam_per_domain=data_args.num_neg_samples_domain_pfam_per_domain,
-    #         num_neg_samples_domain_pfam_per_pfam=data_args.num_neg_samples_domain_pfam_per_pfam,
-    #         use_only_domain_pfam_domains=data_args.use_only_domain_pfam_domains,
-    #         use_only_domain_pfam_pfams=data_args.use_only_domain_pfam_pfams,
-    #         training=False
-    #     )
-
-    # return (train_protein_dataset, train_protein_go_dataset, train_protein_protein_dataset, train_pfam_dataset), (val_protein_dataset, val_protein_go_dataset, val_protein_protein_dataset, val_pfam_dataset)
 
     return (
         train_protein_dataset,
@@ -484,32 +419,7 @@ def get_data_collators(data_args: DataArgs, model_args: ModelArgs) -> Tuple[Any]
             protein_tokenizer=protein_tokenizer,
             max_protein_len=model_args.max_protein_len,
         )
-    # if data_args.use_pfam_cl:
-    #     pfam_collator = PfamRelationsCLCollator(
-    #         data_dir=data_args.data_dir,
-    #         num_domains_sampled_per_pfam=data_args.num_domains_sampled_per_pfam,
-    #         negative_sampling_strategy_pfam_protein=data_args.negative_sampling_strategy_pfam_protein,
-    #         negative_sampling_strategy_pfam_pfam=data_args.negative_sampling_strategy_pfam_pfam,
-    #         protein_sims_type=data_args.protein_sims_type,
-    #         pfam_sims_type=data_args.pfam_sims_type,
-    #         num_neg_samples_pfam_protein_per_protein=data_args.num_neg_samples_pfam_protein_per_protein,
-    #         num_neg_samples_pfam_pfam_per_pfam=data_args.num_neg_samples_pfam_pfam_per_pfam,
-    #         use_only_pfam_protein_proteins=data_args.use_only_pfam_protein_proteins,
-    #         use_only_pfam_pfam_pfams=data_args.use_only_pfam_pfam_pfams,
-    #         is_domain_tokenized=model_args.is_protein_tokenized, # TODO(tom) remove / add data_arg? and check tokenizer creation above
-    #         is_protein_tokenized=model_args.is_protein_tokenized,
-    #         is_go_tokenized=model_args.is_go_tokenized,
-    #         use_go_embeddings=model_args.use_text_embeddings,
-    #         use_protein_embeddings=model_args.use_protein_embeddings,
-    #         use_domain_embeddings=model_args.use_domain_embeddings,
-    #         protein_tokenizer=protein_tokenizer,
-    #         go_tokenizer=text_tokenizer,
-    #         max_protein_len=model_args.max_protein_len,
-    #         max_go_len=data_args.max_go_len,
-    #         use_pfam_protein_cl=data_args.use_pfam_protein_cl,
-    #         use_pfam_go_cl=data_args.use_pfam_go_cl,
-    #         use_pfam_pfam_cl=data_args.use_pfam_pfam_cl
-    #     )
+
     if data_args.use_domain_go_cl:
         domain_go_collator = DomainGOCLCollator(
             data_dir=data_args.data_dir,

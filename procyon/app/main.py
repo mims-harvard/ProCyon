@@ -83,7 +83,7 @@ async def retrieve_proteins(request: RetrievalRequest):
 if __name__ == "__main__":
     """
     This API endpoint will allow users to perform protein retrieval for a given disease description using the 
-        pre-trained ProCyon model Procyon-Full.
+        pre-trained ProCyon model ProCyon-Full.
     This API script can be run directly using the command `python main.py`
     this script will start the FastAPI server on port 8000
     The API will be available at http://localhost:8000
