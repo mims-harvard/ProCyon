@@ -19,7 +19,7 @@ CKPT_NAME = os.path.expanduser(os.getenv("CHECKPOINT_PATH"))
 
 
 def startup_retrieval(
-        inference_bool: bool = True,
+    inference_bool: bool = True,
 ) -> Tuple[
     UnifiedProCyon | None,
     torch.device | None,
@@ -107,16 +107,16 @@ def load_model_onto_device() -> Tuple[UnifiedProCyon, torch.device, DataArgs]:
 
 
 def do_retrieval(
-        model: UnifiedProCyon,
-        data_args: DataArgs,
-        device: torch.device,
-        instruction_source_dataset: str,
-        all_protein_embeddings: torch.Tensor,
-        inference_bool: bool = True,
-        task_desc_infile: Path = None,
-        disease_desc_infile: Path = None,
-        task_desc: str = None,
-        disease_desc: str = None,
+    model: UnifiedProCyon,
+    data_args: DataArgs,
+    device: torch.device,
+    instruction_source_dataset: str,
+    all_protein_embeddings: torch.Tensor,
+    inference_bool: bool = True,
+    task_desc_infile: Path = None,
+    disease_desc_infile: Path = None,
+    task_desc: str = None,
+    disease_desc: str = None,
 ) -> Optional[pd.DataFrame]:
     """
     This function performs protein retrieval for a given disease using the pre-trained ProCyon model.
