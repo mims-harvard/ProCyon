@@ -3,10 +3,10 @@ from typing import Dict, Optional, Tuple, Union
 from pathlib import Path
 
 import argparse
-from loguru import logger
 import pandas as pd
 
 from procyon.inference.retrieval_utils import startup_retrieval, do_retrieval
+from procyon.inference.settings import logger
 
 CKPT_NAME = os.path.expanduser(os.getenv("CHECKPOINT_PATH"))
 
@@ -24,7 +24,8 @@ def single_retrieval(
         task_desc_infile (Path): The path to the file containing the task description.
         disease_desc_infile (Path): The path to the file containing the disease description.
         instruction_source_dataset (str): Dataset source for instructions - either "disgenet" or "omim"
-        inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference
+        inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference or load the model.
+            Loading the model is time-consuming, so consider using this to test that the CLI works.
     Returns:
         Optional[pd.DataFrame]: DataFrame with results if inference_bool is True, None otherwise
     """
@@ -63,7 +64,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--inference_bool",
         action="store_false",
-        help="OPTIONAL; choose this if you do not intend to do inference or load the model",
+        help="OPTIONAL; choose this if you do not intend to do inference or load the model. Loading the model "
+             "is time-consuming, so consider using this to test that the CLI works.",
         default=True,
     )
     parser.add_argument(
