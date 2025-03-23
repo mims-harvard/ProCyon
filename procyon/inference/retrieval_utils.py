@@ -30,8 +30,8 @@ def startup_retrieval(
     This function performs startup functions to initiate protein retrieval:
     Logs into the huggingface hub and loads the pre-trained ProCyon model.
     Args:
-        inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference;
-        then the model will not be loaded.
+        inference_bool (bool): OPTIONAL; choose this if you do not intend to do inference or load the model.
+            Loading the model is time-consuming, so consider using this to test that the CLI works.
     Returns:
         model (UnifiedProCyon): The pre-trained ProCyon model
         device (torch.device): The compute device (GPU or CPU) on which the model is loaded
@@ -51,7 +51,7 @@ def startup_retrieval(
         model, device, data_args = load_model_onto_device()
     else:
         logger.info("Inference is disabled.")
-        # loading the model takes much time and memory, so we skip it if we don't need it
+        # loading the model requires time and memory, so we skip it if we are only testing the CLI
         model = None
         device = None
         data_args = None
