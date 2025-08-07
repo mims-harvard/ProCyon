@@ -38,7 +38,7 @@ uv pip install -r pyproject.toml --extra build --extra compile
 uv pip install -e .
 
 # OR if omitting uv
-python3 pip install -e .
+python3 -m pip install -e .
 ```
 Installation with `uv` should take less than 10 minutes, depending on the
 speed of your internet connection for downloading packages.
@@ -50,9 +50,8 @@ These dependencies
 will all be stored in a single directory, which we denote `DATA_DIR`.
 
 ```
-DATA_DIR=/path/to/data
-mkdir $DATA_DIR
-cd $DATA_DIR
+# Decide where you'd like to keep the ProCyon-Instruct repo
+cd /desired/path/for/data
 
 # Clone ProCyon-Instruct dataset from HuggingFace
 git clone git@hf.co:datasets/mims-harvard/ProCyon-Instruct
@@ -69,7 +68,9 @@ cd ../llama-2-7b-hf
 git clone git@hf.co:meta-llama/Llama-2-7b-hf
 
 # Add a `.env` file which the `procyon` package will use to find the `DATA_DIR`
+DATA_DIR=/desired/path/for/data/ProCyon-Instruct
 cd /path/to/ProCyon
+
 echo "DATA_DIR=\"$DATA_DIR\"" > .env
 echo "HOME_DIR=\"$(pwd)\"" >> .env
 ```
