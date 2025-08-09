@@ -141,7 +141,7 @@ class ProtSTRetrievalEval(AbstractRetrievalModel):
         self.max_len = max_len
 
     @torch.no_grad()
-    def _get_text_embedding(self, prompts):
+    def _get_text_embedding(self, prompts: List[str]) -> torch.Tensor:
         # Code below for getting prompt embeddings is directly from ProtST for consistency.
         # If we wanted to, we could change some odd choices like no EOS token, processing each
         # prompt one at a time, etc.

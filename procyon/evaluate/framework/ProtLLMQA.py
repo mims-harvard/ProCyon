@@ -1,70 +1,52 @@
 import os
 from typing import (
-    Callable,
     Dict,
     List,
-    Tuple,
 )
 
 import torch
 import tqdm
 import pandas as pd
 
-import torch.nn.functional as F
 
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 
-from procyon.data.dataset import (
-    AASeqDataset,
-    AASeqTextUnifiedDataset,
-)
-
-from procyon.model.model_unified import (
-    DEFAULT_PRETRAINED_WEIGHTS_DIR,
-    UnifiedProCyon,
-)
 
 from procyon.data.data_utils import DATA_DIR
 
-from procyon.model.biotranslator_tencoder import HFTextEncoder
-# from procyon.training.args_bio_translator import ModelArgs
+
+from procyon.training.training_args_IT import (
+    DataArgs,
+    ModelArgs,
+    update_data_args_data_dir,
+)
 
 from procyon.evaluate.framework.args import EvalArgs
-from procyon.evaluate.framework.retrieval import (
-    AbstractRetrievalModel,
-    get_retrieval_target_proteins_loader,
-    get_retrieval_target_set,
-)
 from procyon.evaluate.framework.utils import (
-    compare_and_warn_model_args,
     move_inputs_to_device,
+    load_and_validate_model_args,
+    load_datasets_for_eval,
+    override_data_and_model_args,
+    write_metrics,
 )
+from procyon.evaluate.framework.qa import run_qa_eval
 
 from Bio import SeqIO
 
 import torch.nn as nn
-import collections
 import numpy as np
-import torchvision.transforms as transforms
-from esm.data import Alphabet
 
 import transformers
-from transformers import AutoTokenizer, AutoModel, AutoConfig
 from typing import Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 
 from peft import get_peft_model, LoraConfig, PeftModel
 
-from procyon.evaluate.framework.retrieval import (
-    AbstractRetrievalModel,
-    get_retrieval_target_proteins_loader,
-    get_retrieval_target_set,
-)
 from procyon.evaluate.framework.qa import AbstractQAModel
 
 from procyon.training.training_args_IT import ModelArgs
-from procyon.model.protllm import ProtLlmForBinaryCls, Trainer4ProtLlm
+from procyon.model.protllm import ProtLlmForBinaryCls
 
 from functools import partial
 import math
@@ -381,35 +363,36 @@ PROTEIN_RETRIEVAL_TEMPLATE = "<PROT>"
 
 
 class ProtLLMQA(nn.Module):
-    def __init__(self,
-                device,
-                eval_dataset = None,
-                ec_prompt = False,
-                model_name_or_path = "",
-                esm_model_name = "ESM-2-650M",
-                esm_model_file_path = "",
-                protein_model_checkpoint = "",
-                esm_tok_arch_name = "ESM-1b",
-                protein_model_name = "protst",
-                prot_output_size = 512,
-                learn_protst = False,
-                sft_with_lora = False,
-                llm_name_or_path = "",
-                lora_r = 32,
-                lora_alpha = 64,
-                lora_dropout = 0.1,
-                lora_bias = "none",
-                sft_lora_r = 32,
-                sft_lora_alpha = 64,
-                sft_target_modules = "down_proj,up_proj,q_proj,v_proj,k_proj,o_proj,gate_proj",
-                pretrain_target_modules = "down_proj,up_proj,q_proj,v_proj,k_proj,o_proj,gate_proj",
-                bf16 = True,
-                logging_steps = 1000,
-                report_to = 'none',
-                resume_from_checkpoint = "",
-                resume_from_sft_checkpoint = "",
-                save_every_n_samples = 20000,
-                ):
+    def __init__(
+        self,
+        device,
+        eval_dataset = None,
+        ec_prompt = False,
+        model_name_or_path = "",
+        esm_model_name = "ESM-2-650M",
+        esm_model_file_path = "",
+        protein_model_checkpoint = "",
+        esm_tok_arch_name = "ESM-1b",
+        protein_model_name = "protst",
+        prot_output_size = 512,
+        learn_protst = False,
+        sft_with_lora = False,
+        llm_name_or_path = "",
+        lora_r = 32,
+        lora_alpha = 64,
+        lora_dropout = 0.1,
+        lora_bias = "none",
+        sft_lora_r = 32,
+        sft_lora_alpha = 64,
+        sft_target_modules = "down_proj,up_proj,q_proj,v_proj,k_proj,o_proj,gate_proj",
+        pretrain_target_modules = "down_proj,up_proj,q_proj,v_proj,k_proj,o_proj,gate_proj",
+        bf16 = True,
+        logging_steps = 1000,
+        report_to = 'none',
+        resume_from_checkpoint = "",
+        resume_from_sft_checkpoint = "",
+        save_every_n_samples = 20000,
+    ):
         super().__init__()
         self.model_config = MyModelArguments(
            model_name_or_path,
@@ -555,7 +538,7 @@ class ProtLLMQAEval(AbstractQAModel):
         self.DOMAIN_SEQS = [str(seq.seq) for seq in SeqIO.parse(os.path.join(DATA_DIR, f"integrated_data/v1/domain/domain_sequences.fa"), "fasta")]
         self.device = device
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def get_predictions(
         self,
         data_loader: DataLoader,
@@ -618,7 +601,7 @@ class ProtLLMQAEval(AbstractQAModel):
             batch.update({"return_dict": True})
 
             # Move all elements of dictionary to device
-            batch = move_inputs_to_device(batch, device)
+            batch = move_inputs_to_device(batch, self.device)
 
             # Model fwd pass:
             pred_logits = self.model.model(**batch).logits.detach().cpu()
@@ -635,77 +618,219 @@ class ProtLLMQAEval(AbstractQAModel):
 
         return results_dict
 
-def run_qa_eval(
-    model: ProtLLMQAEval,
-    data_loader: DataLoader,
+# def run_qa_eval(
+#     model: ProtLLMQAEval,
+#     data_loader: DataLoader,
+#     eval_args: EvalArgs,
+#     dataset_eval_args: Dict,
+#     model_name: str,
+#     dataset_key: str,
+#     output_dir: str,
+# ) -> Dict:
+#     n_correct = 0
+#     n_example = 0
+#     n_answer0 = 0
+#     n_chunk = 0
+#     all_preds = []
+#     all_labels = []
+#     eval_args = model.model.eval_args
+
+#     for step, batch in tqdm(enumerate(data_loader), total=len(data_loader)):
+#         labels = batch["labels"]
+#         del batch["labels"]
+#         batch = model.model.trainer._prepare_inputs(batch)
+#         batch.update({"return_dict": True})
+#         with torch.no_grad():
+#             logits = model.model.trainer.model(**batch).logits.detach().cpu()
+#         pred = logits.argmax(dim=1)
+
+#         n_correct += (pred.reshape(-1).cpu() == labels.reshape(-1)).sum().item()
+#         n_example += pred.shape[0]
+#         n_answer0 += (pred.reshape(-1) == 0).sum().item()
+
+#         probs = torch.softmax(logits, dim=1)[:, 1]
+#         all_preds.append(probs.detach().cpu())
+#         all_labels.append(labels.detach().cpu())
+
+#         if n_example >= model.model.eval_args.save_every_n_samples * (n_chunk + 1):
+#             all_preds = torch.cat(all_preds, dim=0).view(-1)
+#             all_labels = torch.cat(all_labels, dim=0).view(-1)
+#             torch.save(all_preds, os.path.join(model.model.training_args.output_dir, f"all_preds_{n_chunk}.pt"))
+#             torch.save(all_labels, os.path.join(model.model.training_args.output_dir, f"all_labels_{n_chunk}.pt"))
+#             st_idx = math.ceil(n_prev / model.model.eval_args.n_labels) * model.model.eval_args.n_labels - n_prev
+#             all_labels = all_labels[st_idx:]
+#             all_labels = all_labels[:all_labels.shape[0] // model.model.eval_args.n_labels * model.model.eval_args.n_labels]
+#             all_preds = all_preds[st_idx:]
+#             all_preds = all_preds[:all_preds.shape[0] // model.model.eval_args.n_labels * model.model.eval_args.n_labels]
+#             auprc = area_under_prc(all_preds, all_labels)
+#             f1_score = f1_max(all_preds.reshape(-1, model.model.eval_args.n_labels), all_labels.reshape(-1, model.model.eval_args.n_labels))
+#             print(f'Chunk {n_chunk}: f1: {round(f1_score.item(), 4)}, auprc: {round(auprc.item(), 4)}', flush=True)
+#             all_preds = []
+#             all_labels = []
+#             n_chunk += 1
+#             n_prev = n_example
+
+#     if len(all_preds) > 0:
+#         all_preds = torch.cat(all_preds, dim=0).view(-1)
+#         all_labels = torch.cat(all_labels, dim=0).view(-1)
+#         torch.save(all_preds, os.path.join(model.model.training_args.output_dir, f"all_preds_{n_chunk}.pt"))
+#         torch.save(all_labels, os.path.join(model.model.training_args.output_dir, f"all_labels_{n_chunk}.pt"))
+#         n_chunk += 1
+#         all_preds = []
+#         all_labels = []
+
+#     for i in range(n_chunk):
+#       all_preds.append(torch.load(os.path.join(model.model.training_args.output_dir, f"all_preds_{i}.pt")))
+#       all_labels.append(torch.load(os.path.join(model.model.training_args.output_dir, f"all_labels_{i}.pt")))
+
+#     all_labels = torch.cat(all_labels, dim=0).view(-1)
+#     all_preds = torch.cat(all_preds, dim=0).view(-1)
+#     all_labels = all_labels[:all_labels.shape[0] // eval_args.n_labels * eval_args.n_labels]
+#     all_preds = all_preds[:all_preds.shape[0] // eval_args.n_labels * eval_args.n_labels]
+#     auprc = area_under_prc(all_preds, all_labels)
+#     f1_score = f1_max(all_preds.reshape(-1, eval_args.n_labels), all_labels.reshape(-1, eval_args.n_labels))
+#     ret_dict = {'AUPRC': auprc, 'F1': f1_score, 'acc': n_correct/n_example}
+#     print(ret_dict)
+#     return ret_dict
+
+def get_default_protllm(
     eval_args: EvalArgs,
-    dataset_eval_args: Dict,
-    model_name: str,
-    dataset_key: str,
-    output_dir: str,
-) -> Dict:
-    n_correct = 0
-    n_example = 0
-    n_answer0 = 0
-    n_chunk = 0
-    all_preds = []
-    all_labels = []
-    eval_args = model.model.eval_args
+    model_args: ModelArgs,
+    device,
+):
+    llm_name_or_path = "/n/holylfs06/LABS/mzitnik_lab/Lab/PLM/model_weights/llama-2-7b-hf"
+    resume_from_checkpoint = "/n/holylfs06/LABS/mzitnik_lab/Lab/PLM/model_weights/ProtLLM/snapshots/a402603f6726d9fb9ab0bf6e4e8b1b03ef4f42b1/protllm"
+    resume_from_sft_checkpoint = "/n/holylfs06/LABS/mzitnik_lab/Lab/PLM/model_weights/ProtLLM/snapshots/a402603f6726d9fb9ab0bf6e4e8b1b03ef4f42b1/protllm"
+    protein_model_checkpoint = "/n/holylfs06/LABS/mzitnik_lab/Lab/PLM/model_weights/ProtST/protst_esm2.pth"
 
-    for step, batch in tqdm(enumerate(data_loader), total=len(data_loader)):
-        labels = batch["labels"]
-        del batch["labels"]
-        batch = model.model.trainer._prepare_inputs(batch)
-        batch.update({"return_dict": True})
-        with torch.no_grad():
-            logits = model.model.trainer.model(**batch).logits.detach().cpu()
-        pred = logits.argmax(dim=1)
+    model_config = {
+        "device": device,
+        "llm_name_or_path": llm_name_or_path,
+        "protein_model_checkpoint": protein_model_checkpoint,
+        "resume_from_checkpoint": resume_from_checkpoint,
+        "resume_from_sft_checkpoint": resume_from_sft_checkpoint,
+    }
+    return ProtLLMQAEval(
+        model_config=model_config,
+        eval_args=eval_args,
+        model_args=model_args,
+        device=device,
+    )
 
-        n_correct += (pred.reshape(-1).cpu() == labels.reshape(-1)).sum().item()
-        n_example += pred.shape[0]
-        n_answer0 += (pred.reshape(-1) == 0).sum().item()
 
-        probs = torch.softmax(logits, dim=1)[:, 1]
-        all_preds.append(probs.detach().cpu())
-        all_labels.append(labels.detach().cpu())
 
-        if n_example >= model.model.eval_args.save_every_n_samples * (n_chunk + 1):
-            all_preds = torch.cat(all_preds, dim=0).view(-1)
-            all_labels = torch.cat(all_labels, dim=0).view(-1)
-            torch.save(all_preds, os.path.join(model.model.training_args.output_dir, f"all_preds_{n_chunk}.pt"))
-            torch.save(all_labels, os.path.join(model.model.training_args.output_dir, f"all_labels_{n_chunk}.pt"))
-            st_idx = math.ceil(n_prev / model.model.eval_args.n_labels) * model.model.eval_args.n_labels - n_prev
-            all_labels = all_labels[st_idx:]
-            all_labels = all_labels[:all_labels.shape[0] // model.model.eval_args.n_labels * model.model.eval_args.n_labels]
-            all_preds = all_preds[st_idx:]
-            all_preds = all_preds[:all_preds.shape[0] // model.model.eval_args.n_labels * model.model.eval_args.n_labels]
-            auprc = area_under_prc(all_preds, all_labels)
-            f1_score = f1_max(all_preds.reshape(-1, model.model.eval_args.n_labels), all_labels.reshape(-1, model.model.eval_args.n_labels))
-            print(f'Chunk {n_chunk}: f1: {round(f1_score.item(), 4)}, auprc: {round(auprc.item(), 4)}', flush=True)
-            all_preds = []
-            all_labels = []
-            n_chunk += 1
-            n_prev = n_example
+def run_evaluation(
+    eval_args: EvalArgs,
+    data_args: DataArgs,
+    model_args: ModelArgs,
+):
+    """
+    Primary entrypoint to running evaluation across tasks, models, and datasets.
 
-    if len(all_preds) > 0:
-        all_preds = torch.cat(all_preds, dim=0).view(-1)
-        all_labels = torch.cat(all_labels, dim=0).view(-1)
-        torch.save(all_preds, os.path.join(model.model.training_args.output_dir, f"all_preds_{n_chunk}.pt"))
-        torch.save(all_labels, os.path.join(model.model.training_args.output_dir, f"all_labels_{n_chunk}.pt"))
-        n_chunk += 1
-        all_preds = []
-        all_labels = []
+    eval_args  - As defined in `./args.py`.
+    data_args  - procyon.training.training_args_IT.DataArgs
+    model_args - procyon.training.training_args_IT.ModelArgs
+    """
+    # Overall steps:
+    #  1. Load all datasets from config (where each dataset may be
+    #     overriding some subset of DataArgs).
+    #  2. Run each dataset through given model for associated tasks.
+    #  3. Output evaluation metrics per task and per dataset.
 
-    for i in range(n_chunk):
-      all_preds.append(torch.load(os.path.join(model.model.training_args.output_dir, f"all_preds_{i}.pt")))
-      all_labels.append(torch.load(os.path.join(model.model.training_args.output_dir, f"all_labels_{i}.pt")))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    all_labels = torch.cat(all_labels, dim=0).view(-1)
-    all_preds = torch.cat(all_preds, dim=0).view(-1)
-    all_labels = all_labels[:all_labels.shape[0] // eval_args.n_labels * eval_args.n_labels]
-    all_preds = all_preds[:all_preds.shape[0] // eval_args.n_labels * eval_args.n_labels]
-    auprc = area_under_prc(all_preds, all_labels)
-    f1_score = f1_max(all_preds.reshape(-1, eval_args.n_labels), all_labels.reshape(-1, eval_args.n_labels))
-    ret_dict = {'AUPRC': auprc, 'F1': f1_score, 'acc': n_correct/n_example}
-    print(ret_dict)
-    return ret_dict
+    # Check if we want to override ModelArgs using a ProCyon checkpoint
+    if eval_args.model_args_from_checkpoint != "":
+        checkpoint_dir = eval_args.model_args_from_checkpoint
+        print(f"Loading ModelArgs from ProCyon checkpoint: {checkpoint_dir}")
+        model_args = torch.load(os.path.join(checkpoint_dir, "model_args.pt"))
+        model_args = ModelArgs(**asdict(model_args))
+
+    if eval_args.data_args_from_checkpoint != "":
+        checkpoint_dir = eval_args.data_args_from_checkpoint
+        print(f"Loading DataArgs from ProCyon checkpoint: {checkpoint_dir}")
+        loaded_data_args = torch.load(os.path.join(checkpoint_dir, "data_args.pt"))
+        loaded_data_args = DataArgs(**asdict(loaded_data_args))
+
+        update_data_args_data_dir(loaded_data_args)
+
+        # Prefer to use the data config specified in data_args passed into this function
+        # over one specified in the serialized data config.
+        if data_args.it_data_config_yml is not None:
+            loaded_data_args.it_data_config_yml = data_args.it_data_config_yml
+        data_args = loaded_data_args
+
+    # Check if we want to override any of the DataArgs or ModelArgs values parsed
+    # from the model checkpoint.
+    if eval_args.override_model_data_args_yml is not None:
+        override_data_and_model_args(
+            data_args, model_args, eval_args.override_model_data_args_yml
+        )
+
+    # Get default ProtLLM model
+    model = get_default_protllm(
+        eval_args=eval_args,
+        model_args=model_args,
+        device=device,
+    )
+
+    # Load datasets
+    datasets, collators, dataset_eval_args = load_datasets_for_eval(
+        data_args,
+        model_args,
+        eval_args.separate_splits,
+        eval_args.keep_splits_union,
+    )
+    for task, train_datasets in datasets["train"].items():
+        if len(train_datasets) != 0:
+            print(
+                f"Received training datasets for task {task}, will not be used for evaluation (check data config)"
+            )
+    # Package datasets and collators into data loaders.
+    data_loaders = {}
+    datasets = datasets["testing"]
+    collators = collators["testing"]
+    for task, task_datasets in datasets.items():
+        if task != "qa":
+            raise ValueError("only QA supported")
+        task_loaders = {}
+        for dataset_key, dataset in task_datasets.items():
+            print(f"task: {task} dataset: {dataset_key} N: {len(dataset)}")
+            task_loaders[dataset_key] = DataLoader(
+                dataset,
+                batch_size=eval_args.batch_size,
+                collate_fn=collators[task][dataset_key],
+                num_workers=eval_args.num_workers,
+                pin_memory=True,
+                drop_last=False,
+            )
+        data_loaders[task] = task_loaders
+
+    # Begin evaluation
+    all_results = {}
+    for task, task_loaders in data_loaders.items():
+        print(f"{task}: evaluating on {len(task_loaders)} datasets")
+
+        model_results_dir = os.path.join(eval_args.output_dir, task, "ProtLLM")
+
+        for dataset_key, data_loader in task_loaders.items():
+            this_dataset_eval_args = dataset_eval_args[dataset_key]
+
+            dataset_results_dir = os.path.join(model_results_dir, dataset_key)
+            os.makedirs(dataset_results_dir, exist_ok=True)
+
+            all_results[dataset_key] = run_qa_eval(
+                model,
+                data_loader,
+                eval_args,
+                this_dataset_eval_args,
+                "ProtLLM",
+                dataset_key,
+                dataset_results_dir,
+            )
+
+    wrtite_results = {
+        "qa": {"ProtLLM": all_results}
+    }
+    write_metrics(wrtite_results, eval_args.output_dir)
+    return all_results

@@ -4,30 +4,35 @@ SPLIT_MAPS = {
         "few_shot": "eval_five_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": None,
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "domain_go": {
         "pt_ft": "eval_pt_ft",
         "few_shot": "eval_five_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": None,
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "domain_pfam": {
         "pt_ft": "eval_pt_ft",
         "few_shot": "eval_two_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": None,
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "protein_disgenet": {
         "pt_ft": None,
         "few_shot": "eval_two_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": "eval_zero_shot_easy",
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "protein_reactome": {
         "pt_ft": "eval_pt_ft",
         "few_shot": "eval_two_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": None,
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "protein_protein": None,  # Shouldn't get called anyways
     "protein_omim": {
@@ -35,24 +40,28 @@ SPLIT_MAPS = {
         "few_shot": "eval_two_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": "eval_zero_shot_easy",
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "protein_drugbank": {
         "pt_ft": "eval_pt_ft",
         "few_shot": "eval_two_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": "eval_zero_shot_easy",
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "protein_drugbank:moa": {
         "pt_ft": "eval_pt_ft",
         "few_shot": "eval_two_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": "eval_zero_shot_easy",
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "protein_drugbank:indication": {
         "pt_ft": "eval_pt_ft",
         "few_shot": "eval_two_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": "eval_zero_shot_easy",
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "protein_gtop": None,
     "protein_ec": {
@@ -60,6 +69,7 @@ SPLIT_MAPS = {
         "few_shot": "eval_two_shot",
         "zero_shot": "eval_zero_shot",
         "zero_shot_easy": "eval_zero_shot_easy",
+        "zero_shot_hard": "eval_zero_shot_hard",
     },
     "protein_uniprot": None,
 }

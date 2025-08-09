@@ -234,6 +234,7 @@ class BioTranslator(nn.Module):
         text_maxlen,
         bert_ckpt,
         data_ckpt,
+        **kwargs,
     ):
         super(BioTranslator, self).__init__()
         self.loss_func = torch.nn.BCELoss()
