@@ -1784,14 +1784,10 @@ def get_hparams(args_tuple: Tuple[dataclass]):
 
     return hparams
 
-def update_model_args_data_dir(model_args: ModelArgs):
+def update_model_args_data_dir(model_args: ModelArgs, prev_data_dir: str):
     if not isinstance(model_args, ModelArgs):
         raise ValueError(f"expected ModelArgs, got: {type(model_args)}")
 
-    # Just arbitrarily picked one argument to use to try to get the DATA_DIR used for
-    # the current set of model arguments.
-    arg_suffix = ModelArgs().protein_seq_embeddings_path.lstrip(DATA_DIR)
-    prev_data_dir = model_args.protein_seq_embeddings_path.rstrip(arg_suffix)
     if DATA_DIR == prev_data_dir:
         return
     print(f"updating model args DATA_DIR from {prev_data_dir} -> {DATA_DIR}")
