@@ -1323,6 +1323,7 @@ class UnifiedProCyon(nn.Module):
                 - Set enforce_checkpoint_architecture_strict=True if you want to assert that architecture arguments align
         '''
         config_checkpoint = torch.load(os.path.join(checkpoint_dir, "model_args.pt"))
+        data_args = torch.load(os.path.join(checkpoint_dir, "data_args.pt"))
 
         if config is None:
             config = config_checkpoint
@@ -1368,7 +1369,7 @@ class UnifiedProCyon(nn.Module):
             config.protein_pooling_correction_option = protein_pooling_correction_option
 
         if model is None:
-            update_model_args_data_dir(config)
+            update_model_args_data_dir(config, prev_data_dir=data_args.data_dir)
             model = UnifiedProCyon(pretrained_weights_dir = pretrained_weights_dir, config = config, for_pretraining = False)
 
             # Check if state_dict has been consolidated locally:
